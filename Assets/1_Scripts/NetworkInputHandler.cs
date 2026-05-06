@@ -34,8 +34,10 @@ public class NetworkInputHandler : MonoBehaviour, INetworkRunnerCallbacks
 
         input.Set(data);
     }
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player){
+        Debug.Log("Player Joined");
+    }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player){ }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
