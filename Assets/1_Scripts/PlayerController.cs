@@ -17,7 +17,7 @@ public class PlayerController : NetworkBehaviour
 
             networkCharacterController.Move(5 * moveDirection * Runner.DeltaTime);
 
-            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
+            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
             {
                 networkCharacterController.Jump();
             }

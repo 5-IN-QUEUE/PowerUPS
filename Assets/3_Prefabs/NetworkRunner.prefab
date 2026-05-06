@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8290390901921655168}
   - component: {fileID: 5276051199495632097}
   - component: {fileID: 2500712221657041659}
-  - component: {fileID: -4963864764743970445}
   m_Layer: 0
   m_Name: NetworkRunner
   m_TagString: Untagged
@@ -79,17 +78,3 @@ MonoBehaviour:
   IsSceneTakeOverEnabled: 1
   LogSceneLoadErrors: 1
   DestroySpawnedPrefabsOnSceneUnload: 1
---- !u!114 &-4963864764743970445
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 871426673071011390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19cbbec250b5f9c458c9d76492473b0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawner
-  _playerPrefab:
-    RawGuidValue: 9e0c93958847b8b459caf5acf8aeb017

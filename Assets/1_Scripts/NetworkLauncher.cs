@@ -10,6 +10,10 @@ public class NetworkLauncher : MonoBehaviour
     {
         _runner = Instantiate(_networkRunnerPrefab);
         _runner.ProvideInput = true;
+
+        _runner.AddCallbacks(GetComponent<NetworkInputHandler>());
+        _runner.AddCallbacks(GetComponent<PlayerSpawner>());
+
         await _runner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.AutoHostOrClient,
