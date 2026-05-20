@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: efe334393b29c104c9a3d18e8b153734
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 161904
+  packageName: Low Poly Industrial Factory
+  packageVersion: 1.0
+  assetPath: Assets/LowPoly/Low_Poly_Factory/Prefabs/Buildings/Vents/Vent_Down.prefab
+  uploadId: 351323
