@@ -4,22 +4,27 @@ using UnityEngine;
 public class PlayerController : NetworkBehaviour
 {
     private NetworkCharacterController networkCharacterController;
-
+    public static GameObject localPlayer;
     [Networked]public Color playerColor{get; set;}
     [Networked]public string playerName{get; set;}
+    
     private void Awake()
     {
         networkCharacterController = GetComponent<NetworkCharacterController>();
     }
-    public override void Spawned(){  // Fusion의 네트워크 생명주기 사용
+    public override void Spawned(){// Fusion의 네트워크 생명주기 사용
         if (HasStateAuthority){
             playerColor = new Color(Random.Range(0f,1f),Random.Range(0f,1f),Random.Range(0f,1f));
             playerName = $"Player{Random.Range(0,999999)}";
+        }
+        if(HasInputAuthority){
+            PlayerController.localPlayer = gameObject;
         }
     }
     private void Start()
     {
         transform.GetChild(0).GetComponent<TextMesh>().text = playerName;
+        gameObject.name = playerName;
         transform.GetComponent<MeshRenderer>().material.color = playerColor;
     }
     public override void FixedUpdateNetwork()
