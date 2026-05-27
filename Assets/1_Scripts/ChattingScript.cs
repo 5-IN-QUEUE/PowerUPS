@@ -2,20 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ChattingScript : NetworkBehaviour  // ✅ NetworkBehaviour로 변경
 {
     public GameObject ChatPrefab;
     private Transform textGroup;
-    private Text inputText;
+    private InputField inputText;
     private List<GameObject> chattingQueue;
 
     void Awake()
     {
         textGroup = transform.GetChild(0);
-        inputText = transform.GetChild(1).GetChild(1).GetComponent<Text>();
+        inputText = transform.GetChild(1).GetComponent<InputField>();
         chattingQueue = new List<GameObject>();
+    }
+    public override void FixedUpdateNetwork()
+    {
+        EventSystem.current.SetSelectedGameObject(inputText.gameObject);
+        if (Input.GetKey(KeyCode.KeypadEnter))
+        {
+            OnSendButtonClicked();
+        };
     }
 
     // ✅ 버튼 OnClick에서 이걸 호출
