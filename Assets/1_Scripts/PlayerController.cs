@@ -11,10 +11,14 @@ public class PlayerController : NetworkBehaviour
     {
         networkCharacterController = GetComponent<NetworkCharacterController>();
     }
+    public override void Spawned(){  // Fusion의 네트워크 생명주기 사용
+        if (HasStateAuthority){
+            playerColor = new Color(Random.Range(0f,1f),Random.Range(0f,1f),Random.Range(0f,1f));
+            playerName = $"Player{Random.Range(0,999999)}";
+        }
+    }
     private void Start()
     {
-        playerColor = new Color(Random.Range(0f,1f),Random.Range(0f,1f),Random.Range(0f,1f));
-        playerName = $"Player{Random.Range(0,999999)}";
         transform.GetChild(0).GetComponent<TextMesh>().text = playerName;
         transform.GetComponent<MeshRenderer>().material.color = playerColor;
     }
