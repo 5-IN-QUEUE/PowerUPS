@@ -11,7 +11,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         if (runner.IsServer){
-            Vector3 spawnPosition = new Vector3(0, 15, 0);
+            Vector3 spawnPosition = new Vector3(0, 8, 0);
             NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
             _spawnedCharacters.Add(player, networkPlayerObject);
             
