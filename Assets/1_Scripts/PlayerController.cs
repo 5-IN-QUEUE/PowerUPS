@@ -12,6 +12,12 @@ public class PlayerController : NetworkBehaviour
     {
         networkCharacterController = GetComponent<NetworkCharacterController>();
     }
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_SendChatMessage(string senderName, string message)
+    {
+        // 채팅 UI 찾아서 메시지 표시
+        FindObjectOfType<ChattingScript>().AddChatMessage(senderName, message);
+    }
     public override void Spawned(){// Fusion의 네트워크 생명주기 사용
         if (HasStateAuthority){
             playerColor = new Color(Random.Range(0f,1f),Random.Range(0f,1f),Random.Range(0f,1f));
