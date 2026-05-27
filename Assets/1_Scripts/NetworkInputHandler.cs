@@ -29,6 +29,12 @@ public class NetworkInputHandler : MonoBehaviour, INetworkRunnerCallbacks
 
         if (Input.GetKey(KeyCode.D))
             data.direction += Vector3.right;
+        
+        if (PlayerController.localPlayer != null){
+            data.direction = PlayerController.localPlayer.transform.TransformDirection(data.direction);
+        }
+        if (Input.GetKey(KeyCode.Space))
+            data.Jump = true;
 
         data.buttons.Set(NetworkInputData.MOUSEBUTTON0, mouse0);
         mouse0 = false;

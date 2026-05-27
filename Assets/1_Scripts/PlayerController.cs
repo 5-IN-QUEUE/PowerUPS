@@ -24,7 +24,7 @@ public class PlayerController : NetworkBehaviour
             playerName = $"Player{Random.Range(0,999999)}";
         }
         if(HasInputAuthority){
-            PlayerController.localPlayer = gameObject;
+            localPlayer = gameObject;
         }
     }
     private void Start()
@@ -39,8 +39,9 @@ public class PlayerController : NetworkBehaviour
         {
             Vector3 moveDirection = data.direction.normalized;
             networkCharacterController.Move(5 * moveDirection * Runner.DeltaTime);
-            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)){
+            if (data.Jump){
                 networkCharacterController.Jump();
+                data.Jump = false;
             }
         }
     }

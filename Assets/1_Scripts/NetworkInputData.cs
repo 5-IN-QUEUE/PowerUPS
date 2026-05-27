@@ -8,4 +8,5 @@ public struct NetworkInputData : INetworkInput
 
     public Vector3 direction;
     public NetworkButtons buttons;
+    public bool Jump;
 }

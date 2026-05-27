@@ -17,14 +17,26 @@ public class ChattingScript : NetworkBehaviour  // ✅ NetworkBehaviour로 변�
         textGroup = transform.GetChild(0);
         inputText = transform.GetChild(1).GetComponent<InputField>();
         chattingQueue = new List<GameObject>();
+        inputText.onEndEdit.AddListener(OnEndEdit);
     }
-    public override void FixedUpdateNetwork()
+
+    // InputField에서 엔터 누르면 자동 호출됨
+    private void OnEndEdit(string value)
     {
-        EventSystem.current.SetSelectedGameObject(inputText.gameObject);
-        if (Input.GetKey(KeyCode.KeypadEnter))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
             OnSendButtonClicked();
-        };
+            inputText.DeactivateInputField();
+        }
+    }
+    void Update()  // ✅ FixedUpdateNetwork → Update로 변경
+    {
+        // T키: 입력창 활성화
+        if (Input.GetKeyDown(KeyCode.T))  // ✅ GetKey → GetKeyDown (한 번만 실행)
+        {
+            inputText.ActivateInputField();
+            inputText.Select();
+        }
     }
 
     // ✅ 버튼 OnClick에서 이걸 호출
