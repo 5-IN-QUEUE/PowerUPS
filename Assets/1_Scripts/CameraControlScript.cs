@@ -14,8 +14,8 @@ public class CameraControlScript : MonoBehaviour
 
     void Update()
     {
-        if (PlayerController.localPlayer != null)
-        {
+        if (PlayerController.localPlayer != null){
+            transform.parent = PlayerController.localPlayer.transform.GetChild(1);
             WaitingUI.SetActive(false);
 
             rotateX += Input.mousePositionDelta.x;
@@ -33,12 +33,12 @@ public class CameraControlScript : MonoBehaviour
 
             // ✅ 카메라 위치/회전은 카메라가 직접 계산
             Vector3 targetPos = PlayerController.localPlayer.transform.position
-                + Vector3.up * Offsets.y
-                + PlayerController.localPlayer.transform.forward * Offsets.z;
+                + transform.parent.up * Offsets.y
+                + transform.parent.forward * Offsets.z;
 
-            transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * 10f);
-            transform.rotation = Quaternion.Euler(0, rotateX, 0);
-            PlayerController.localPlayer.transform.GetChild(2).localRotation = Quaternion.Euler(-rotateY, 0, 0);
+            transform.position = targetPos;
+            transform.rotation = PlayerController.localPlayer.transform.GetChild(1).rotation;
+            transform.parent.localRotation = Quaternion.Euler(-rotateY, 0, 0);
 
         }
     }
