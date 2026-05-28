@@ -33,13 +33,19 @@ public class PlayerController : NetworkBehaviour
         gameObject.name = playerName;
         transform.GetComponent<MeshRenderer>().material.color = playerColor;
     }
-    public override void FixedUpdateNetwork()
-    {
-        if (GetInput(out NetworkInputData data)) //get data in server
+    public override void FixedUpdateNetwork(){
+        if (GetInput(out NetworkInputData data))
         {
-            Vector3 moveDirection = data.direction.normalized;
-            networkCharacterController.Move(5 * moveDirection * Runner.DeltaTime);
-            if (data.Jump){
+            // ✅ 항상 카메라 방향으로 회전 고정
+            transform.rotation = Quaternion.Euler(0, data.rotationY, 0);
+
+            Quaternion rot = Quaternion.Euler(0, data.rotationY, 0);
+            Vector3 moveDirection = rot * data.direction; // 카메라 기준 방향
+
+            networkCharacterController.Move(moveDirection.normalized * 5 * Runner.DeltaTime);
+
+            if (data.Jump)
+            {
                 networkCharacterController.Jump();
                 data.Jump = false;
             }

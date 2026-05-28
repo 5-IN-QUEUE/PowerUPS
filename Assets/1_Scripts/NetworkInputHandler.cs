@@ -14,31 +14,21 @@ public class NetworkInputHandler : MonoBehaviour, INetworkRunnerCallbacks
             mouse0 = true;
     }
     [Networked]public Color playerColor{get; set;}
+    public static float rotationY = 0f; // ✅ 추가
+
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var data = new NetworkInputData();
 
-        if (Input.GetKey(KeyCode.W))
-            data.direction += Vector3.forward;
-
-        if (Input.GetKey(KeyCode.S))
-            data.direction += Vector3.back;
-
-        if (Input.GetKey(KeyCode.A))
-            data.direction += Vector3.left;
-
-        if (Input.GetKey(KeyCode.D))
-            data.direction += Vector3.right;
+        if (Input.GetKey(KeyCode.W)) data.direction += Vector3.forward;
+        if (Input.GetKey(KeyCode.S)) data.direction += Vector3.back;
+        if (Input.GetKey(KeyCode.A)) data.direction += Vector3.left;
+        if (Input.GetKey(KeyCode.D)) data.direction += Vector3.right;
+        if (Input.GetKey(KeyCode.Space)) data.Jump = true;
         
-        if (PlayerController.localPlayer != null){
-            data.direction = PlayerController.localPlayer.transform.TransformDirection(data.direction);
-        }
-        if (Input.GetKey(KeyCode.Space))
-            data.Jump = true;
-
+        data.rotationY = rotationY; // ✅ 회전값만 전송
         data.buttons.Set(NetworkInputData.MOUSEBUTTON0, mouse0);
         mouse0 = false;
-
         input.Set(data);
     }
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player){Debug.Log("Player Joined");}

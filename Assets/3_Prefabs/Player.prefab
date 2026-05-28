@@ -135,11 +135,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fusion.Unity::Fusion.NetworkCharacterController
   _stateAuthorityChangeErrorCorrectionDelta: 0
   gravity: -20
-  jumpImpulse: 8
+  jumpImpulse: 12
   acceleration: 10
   braking: 10
-  maxSpeed: 2
-  rotationSpeed: 0
+  maxSpeed: 5
+  rotationSpeed: 3
 --- !u!114 &2919758732797369288
 MonoBehaviour:
   m_ObjectHideFlags: 0

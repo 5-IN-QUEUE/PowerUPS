@@ -807,7 +807,6 @@ GameObject:
   - component: {fileID: 1195112910}
   - component: {fileID: 1195112909}
   - component: {fileID: 1195112908}
-  - component: {fileID: 1195112907}
   - component: {fileID: 1195112906}
   m_Layer: 0
   m_Name: Plane (2)
@@ -837,18 +836,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000001, y: 1, z: 1.0000001}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1195112907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1195112905}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12400f0cc44264eecbcbe9168a9b0039, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BillboardScript
 --- !u!23 &1195112908
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -932,7 +919,6 @@ GameObject:
   - component: {fileID: 1389342875}
   - component: {fileID: 1389342874}
   - component: {fileID: 1389342873}
-  - component: {fileID: 1389342872}
   - component: {fileID: 1389342871}
   m_Layer: 0
   m_Name: Plane (1)
@@ -962,18 +948,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000001, y: 1, z: 1.0000001}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1389342872
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1389342870}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12400f0cc44264eecbcbe9168a9b0039, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BillboardScript
 --- !u!23 &1389342873
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1057,7 +1031,6 @@ GameObject:
   - component: {fileID: 1499628580}
   - component: {fileID: 1499628579}
   - component: {fileID: 1499628578}
-  - component: {fileID: 1499628577}
   - component: {fileID: 1499628576}
   m_Layer: 0
   m_Name: Plane (3)
@@ -1087,18 +1060,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000001, y: 1, z: 1.0000001}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1499628577
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1499628575}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12400f0cc44264eecbcbe9168a9b0039, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BillboardScript
 --- !u!23 &1499628578
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2011,7 +1972,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80072d7cfb17e40a7ad3904ed503ef4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraControlScript
-  isPlayerSpawned: {fileID: 0}
   rotateX: 0
   WaitingUI: {fileID: 185365305}
 --- !u!1660057539 &9223372036854775807
