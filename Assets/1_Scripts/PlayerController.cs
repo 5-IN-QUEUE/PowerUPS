@@ -7,6 +7,7 @@ public class PlayerController : NetworkBehaviour
     public static GameObject localPlayer;
     [Networked]public Color playerColor{get; set;}
     [Networked]public string playerName{get; set;}
+    [Networked]public int PlayerHealth{get; set;}
     
     private void Awake()
     {
@@ -24,6 +25,7 @@ public class PlayerController : NetworkBehaviour
             playerName = $"Player{Random.Range(0,999999)}";
         }
         if(HasInputAuthority){
+            PlayerHealth = 100;
             localPlayer = gameObject;
         }
     }
