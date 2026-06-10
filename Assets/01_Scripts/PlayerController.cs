@@ -17,7 +17,7 @@ public class PlayerController : NetworkBehaviour
     public void RPC_SendChatMessage(string senderName, string message)
     {
         // 채팅 UI 찾아서 메시지 표시
-        FindObjectOfType<ChattingScript>().AddChatMessage(senderName, message);
+        FindAnyObjectByType<ChattingScript>().AddChatMessage(senderName, message);
     }
     public override void Spawned(){// Fusion의 네트워크 생명주기 사용
         if (HasStateAuthority){
