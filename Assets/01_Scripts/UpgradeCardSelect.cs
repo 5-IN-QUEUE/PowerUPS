@@ -4,10 +4,9 @@ using System.Collections;
 
 public class UpgradeCardSelect : MonoBehaviour
 {
-    [Header("카드 루트 오브젝트들 (CardImage1~4 순서대로)")]
-    public RectTransform[] upgradeCards; // 4개
+    public RectTransform[] upgradeCards;
 
-    public float animDuration = 0.3f;
+    public float animDuration;
 
     private struct TextLayout
     {
@@ -39,6 +38,7 @@ public class UpgradeCardSelect : MonoBehaviour
             {
                 worldPos  = upgradeCards[i].position,
                 sizeDelta = upgradeCards[i].sizeDelta,
+                
                 nameLayout = new TextLayout
                 {
                     anchoredPos = nameRect.anchoredPosition,
