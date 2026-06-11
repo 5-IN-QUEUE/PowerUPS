@@ -1,86 +1,148 @@
 using UnityEngine;
-using System;
+using TMPro;
 using System.Collections;
-using System.Collections.Generic;
-using Random = UnityEngine.Random;
 
 public class UpgradeCardSelect : MonoBehaviour
 {
-   public GameObject[] upgradeCards;
+    [Header("카드 루트 오브젝트들 (CardImage1~4 순서대로)")]
+    public RectTransform[] upgradeCards; // 4개
 
-   private int index;
-   private int length;
-   
-   private GameObject currentCard;
-   private Vector3 currentCardScale;
-   private GameObject previousCard;
-   private Vector3 previousCardScale;
-   
+    public float animDuration = 0.3f;
 
-   void Start()
-   {
-      length = upgradeCards.Length;
-      index = 0;
-      
-      SelectCard(index);
-   }
+    private struct TextLayout
+    {
+        public Vector2 anchoredPos;
+        public Vector2 sizeDelta;
+        public float fontSize;
+    }
 
-   void Update()
-   {
-      if (Input.GetKeyDown(KeyCode.A))
-      {
-         index--;
-         if (index < 0) index = length - 1;
-         SelectCard(index);
-         
-         Debug.Log(index);
-      }
+    private struct CardLayout
+    {
+        public Vector3 worldPos;
+        public Vector2 sizeDelta;
+        public TextLayout nameLayout;
+        public TextLayout descLayout;
+    }
 
-      if (Input.GetKeyDown(KeyCode.D))
-      {
-         index++;
-         if (index >= length) index = 0;
-         SelectCard(index);
-         
-         Debug.Log(index);
-      }
-   }
+    private CardLayout[] slotLayouts = new CardLayout[4];
+    private int currentIdx = 0;
+    private int animatingCount = 0;
 
-   public void SelectCard(int idx)
-   {
-      previousCard = currentCard;
-      previousCardScale = currentCardScale;
-      currentCard = upgradeCards[idx];
-      currentCardScale = currentCard.transform.localScale;
-      
-      if (previousCard is not null) StartCoroutine(ChangeScaleCard(previousCard, true));
-      if (currentCard is not null) StartCoroutine(ChangeScaleCard(currentCard, false));
-      
-      if (previousCard is not null) previousCard.transform.localScale = currentCardScale;
-      if (currentCard is not null) currentCard.transform.localScale = previousCardScale;
-   }
+    void Start()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            var nameRect = upgradeCards[i].GetChild(0).GetComponent<RectTransform>();
+            var descRect = upgradeCards[i].GetChild(1).GetComponent<RectTransform>();
 
-   IEnumerator ChangeScaleCard(GameObject card, bool isShrinking)
-   {
-      float t = 0f;
-   
-      Vector3 startScale = card.transform.localScale;
-      Vector3 endScale = (isShrinking) ? card.transform.localScale / 1.5f : card.transform.localScale * 1.5f;
-      
-      while (t <= 1f)
-      {
-         t += Time.deltaTime / 0.3f;
-         
-         if (card != null)
-         {
-            card.transform.localScale = Vector3.Lerp(startScale, endScale, t / 0.3f);
-         }
-         else
-         {
-            break;
-         }
-         
-         yield return null;
-      }
-   }
+            slotLayouts[i] = new CardLayout
+            {
+                worldPos  = upgradeCards[i].position,
+                sizeDelta = upgradeCards[i].sizeDelta,
+                nameLayout = new TextLayout
+                {
+                    anchoredPos = nameRect.anchoredPosition,
+                    sizeDelta   = nameRect.sizeDelta,
+                    fontSize    = nameRect.GetComponent<TextMeshProUGUI>().fontSize
+                },
+                descLayout = new TextLayout
+                {
+                    anchoredPos = descRect.anchoredPosition,
+                    sizeDelta   = descRect.sizeDelta,
+                    fontSize    = descRect.GetComponent<TextMeshProUGUI>().fontSize
+                }
+            };
+        }
+
+        UpdateLayout(animated: false);
+    }
+
+    void Update()
+    {
+        if (animatingCount > 0) return;
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            currentIdx = (currentIdx - 1 + 4) % 4;
+            UpdateLayout(animated: true);
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            currentIdx = (currentIdx + 1) % 4;
+            UpdateLayout(animated: true);
+        }
+    }
+
+    void UpdateLayout(bool animated)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            int slotIdx = (i - currentIdx + 4) % 4;
+            CardLayout targetLayout = slotLayouts[slotIdx];
+
+            if (animated)
+                StartCoroutine(AnimateCard(upgradeCards[i], targetLayout));
+            else
+                ApplyLayout(upgradeCards[i], targetLayout);
+        }
+    }
+
+    void ApplyLayout(RectTransform card, CardLayout layout)
+    {
+        var nameRect = card.GetChild(0).GetComponent<RectTransform>();
+        var descRect = card.GetChild(1).GetComponent<RectTransform>();
+
+        card.position    = layout.worldPos;
+        card.sizeDelta   = layout.sizeDelta;
+
+        nameRect.anchoredPosition = layout.nameLayout.anchoredPos;
+        nameRect.sizeDelta        = layout.nameLayout.sizeDelta;
+        nameRect.GetComponent<TextMeshProUGUI>().fontSize = layout.nameLayout.fontSize;
+
+        descRect.anchoredPosition = layout.descLayout.anchoredPos;
+        descRect.sizeDelta        = layout.descLayout.sizeDelta;
+        descRect.GetComponent<TextMeshProUGUI>().fontSize = layout.descLayout.fontSize;
+    }
+
+    IEnumerator AnimateCard(RectTransform card, CardLayout targetLayout)
+    {
+        animatingCount++;
+
+        var nameRect = card.GetChild(0).GetComponent<RectTransform>();
+        var descRect = card.GetChild(1).GetComponent<RectTransform>();
+
+        Vector3 startCardPos     = card.position;
+        Vector2 startCardSize    = card.sizeDelta;
+
+        Vector2 startNamePos     = nameRect.anchoredPosition;
+        Vector2 startNameSize    = nameRect.sizeDelta;
+        float   startNameFont    = nameRect.GetComponent<TextMeshProUGUI>().fontSize;
+
+        Vector2 startDescPos     = descRect.anchoredPosition;
+        Vector2 startDescSize    = descRect.sizeDelta;
+        float   startDescFont    = descRect.GetComponent<TextMeshProUGUI>().fontSize;
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / animDuration;
+            float ease = Mathf.SmoothStep(0f, 1f, t);
+
+            card.position    = Vector3.Lerp(startCardPos, targetLayout.worldPos, ease);
+            card.sizeDelta   = Vector2.Lerp(startCardSize, targetLayout.sizeDelta, ease);
+
+            nameRect.anchoredPosition = Vector2.Lerp(startNamePos, targetLayout.nameLayout.anchoredPos, ease);
+            nameRect.sizeDelta        = Vector2.Lerp(startNameSize, targetLayout.nameLayout.sizeDelta, ease);
+            nameRect.GetComponent<TextMeshProUGUI>().fontSize = Mathf.Lerp(startNameFont, targetLayout.nameLayout.fontSize, ease);
+
+            descRect.anchoredPosition = Vector2.Lerp(startDescPos, targetLayout.descLayout.anchoredPos, ease);
+            descRect.sizeDelta        = Vector2.Lerp(startDescSize, targetLayout.descLayout.sizeDelta, ease);
+            descRect.GetComponent<TextMeshProUGUI>().fontSize = Mathf.Lerp(startDescFont, targetLayout.descLayout.fontSize, ease);
+
+            yield return null;
+        }
+
+        ApplyLayout(card, targetLayout);
+        animatingCount--;
+    }
 }

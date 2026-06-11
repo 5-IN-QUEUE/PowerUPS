@@ -1,15 +1,15 @@
 fileFormatVersion: 2
-guid: 85f4fe711f3304cf4a0a05d1977dca64
+guid: c32c8aa36454a43158b7f3662c649d81
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
   fontSize: 16
-  forceTextureCase: -1
+  forceTextureCase: -2
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Noto Sans KR
+  - Do Hyeon
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
