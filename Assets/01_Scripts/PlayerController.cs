@@ -33,7 +33,7 @@ public class PlayerController : NetworkBehaviour
     {
         transform.GetChild(0).GetComponent<TextMesh>().text = playerName;
         gameObject.name = playerName;
-        transform.GetComponent<MeshRenderer>().material.color = playerColor;
+        //transform.GetComponent<MeshRenderer>().material.color = playerColor;
     }
     public override void FixedUpdateNetwork(){
         if (GetInput(out NetworkInputData data))
