@@ -1,64 +1,100 @@
-using System.Collections;
 using System.Collections.Generic;
-using Fusion;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ChattingScript : NetworkBehaviour  // ✅ NetworkBehaviour로 변경
+public class ChattingScript : MonoBehaviour  // ✅ MonoBehaviour로 충분
 {
-    public GameObject ChatPrefab;
-    private Transform textGroup;
-    private InputField inputText;
-    private List<GameObject> chattingQueue;
+    public static ChattingScript Instance { get; private set; }  // ✅ 싱글톤
 
-    void Awake()
+    [SerializeField] private GameObject chatPrefab;
+    [SerializeField] private Transform  textGroup;
+    [SerializeField] private InputField inputField;
+    [SerializeField] private int        maxMessages = 9;
+
+    // ✅ 채팅창 열려있는지 외부(InputHandler)에서 읽어감
+    public bool IsChatOpen { get; private set; } = false;
+
+    private readonly List<GameObject> _messageQueue = new();
+
+    private void Awake()
     {
-        textGroup = transform.GetChild(0);
-        inputText = transform.GetChild(1).GetComponent<InputField>();
-        chattingQueue = new List<GameObject>();
-        inputText.onEndEdit.AddListener(OnEndEdit);
+        // 싱글톤 설정
+        if (Instance != null) { Destroy(gameObject); return; }
+        Instance = this;
+
+        // ✅ Inspector 직접 연결 권장, 없으면 폴백
+        if (textGroup  == null) textGroup  = transform.GetChild(0);
+        if (inputField == null) inputField = transform.GetChild(1).GetComponent<InputField>();
+
+        // ✅ onEndEdit 대신 submitString 방식
+        inputField.onEndEdit.AddListener(OnEndEdit);
     }
 
-    // InputField에서 엔터 누르면 자동 호출됨
+    private void Update()
+    {
+        // T키: 채팅창 열기
+        if (Input.GetKeyDown(KeyCode.T) && !IsChatOpen)
+            OpenChat();
+
+        // ESC키: 채팅창 닫기
+        if (Input.GetKeyDown(KeyCode.Escape) && IsChatOpen)
+            CloseChat();
+    }
+
+    // ✅ onEndEdit은 value만 받고 엔터 여부는 submitString으로 판단
     private void OnEndEdit(string value)
     {
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-        {
-            OnSendButtonClicked();
-            inputText.DeactivateInputField();
-        }
+        // InputField의 lineType이 Single이면 엔터 = submit
+        if (!string.IsNullOrWhiteSpace(value))
+            SendMessage_Internal(value);
+
+        CloseChat();
     }
-    void Update()  // ✅ FixedUpdateNetwork → Update로 변경
+
+    public void OnSendButtonClicked()
     {
-        // T키: 입력창 활성화
-        if (Input.GetKeyDown(KeyCode.T))  // ✅ GetKey → GetKeyDown (한 번만 실행)
-        {
-            inputText.ActivateInputField();
-            inputText.Select();
-        }
+        if (string.IsNullOrWhiteSpace(inputField.text)) return;
+        SendMessage_Internal(inputField.text);
+        CloseChat();
     }
 
-    // ✅ 버튼 OnClick에서 이걸 호출
-    public void OnSendButtonClicked(){
-        if (PlayerController.localPlayer == null) return; // 안전 체크
-        if (string.IsNullOrEmpty(inputText.text)) return; // 빈 메시지 방지
-        PlayerController.localPlayer
-        .GetComponent<PlayerController>()
-        .RPC_SendChatMessage(PlayerController.localPlayer.name, inputText.text);
+    private void SendMessage_Internal(string message)
+    {
+        if (PlayerController.localPlayer == null) return;
 
-        inputText.text = ""; // 입력창 초기화
+        var pc = PlayerController.localPlayer.GetComponent<PlayerController>();
+        pc.RPC_SendChatMessage(pc.PlayerName.ToString(), message);
+
+        inputField.text = "";
     }
+
     public void AddChatMessage(string senderName, string message)
     {
-        GameObject newPrefab = Instantiate(ChatPrefab, textGroup);
-        newPrefab.transform.GetComponent<Text>().text 
-            = $"[{senderName}] {message}";
-        if(chattingQueue.Count >= 9){
-            Destroy(chattingQueue[0]);
-            chattingQueue.RemoveAt(0);
+        // 최대 메시지 초과 시 가장 오래된 것 제거
+        if (_messageQueue.Count >= maxMessages)
+        {
+            Destroy(_messageQueue[0]);
+            _messageQueue.RemoveAt(0);
         }
-        chattingQueue.Add(newPrefab);
+
+        var newMsg = Instantiate(chatPrefab, textGroup);
+        newMsg.GetComponent<Text>().text = $"[{senderName}] {message}";
+        _messageQueue.Add(newMsg);
     }
 
+    // ==================== 채팅창 열기/닫기 ====================
+
+    private void OpenChat()
+    {
+        IsChatOpen = true;
+        inputField.ActivateInputField();
+        inputField.Select();
+    }
+
+    private void CloseChat()
+    {
+        IsChatOpen = false;
+        inputField.DeactivateInputField();
+        inputField.text = "";
+    }
 }

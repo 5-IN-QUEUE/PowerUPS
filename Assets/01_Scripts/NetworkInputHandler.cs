@@ -6,33 +6,48 @@ using UnityEngine;
 
 public class NetworkInputHandler : MonoBehaviour, INetworkRunnerCallbacks
 {
-    private bool mouse0;
+    private bool _firePressed = false;
+    private bool _jumpPressed = false;
 
+    // NetworkInputHandler.cs
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-            mouse0 = true;
+        if (Input.GetMouseButtonDown(0)) _firePressed = true;
+        if (Input.GetKeyDown(KeyCode.Space)) _jumpPressed = true;  // ✅ Down으로 수집
     }
-    [Networked]public Color playerColor{get; set;}
-    public static float rotationY = 0f; // ✅ 추가
-
+    // NetworkInputHandler.cs
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var data = new NetworkInputData();
 
+        // ✅ 채팅창 열려있으면 이동/사격 입력 무시
+        if (ChattingScript.Instance != null && ChattingScript.Instance.IsChatOpen)
+        {
+            input.Set(data);  // 빈 입력 전송
+            return;
+        }
+
+        // 이하 기존 입력 처리
         if (Input.GetKey(KeyCode.W)) data.direction += Vector3.forward;
         if (Input.GetKey(KeyCode.S)) data.direction += Vector3.back;
         if (Input.GetKey(KeyCode.A)) data.direction += Vector3.left;
         if (Input.GetKey(KeyCode.D)) data.direction += Vector3.right;
-        if (Input.GetKey(KeyCode.Space)) data.Jump = true;
-        
-        data.rotationY = rotationY; // ✅ 회전값만 전송
-        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, mouse0);
-        mouse0 = false;
+
+        if (CameraController.Instance != null)
+            data.rotationY = CameraController.Instance.Yaw;
+
+        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, _firePressed);
+        data.buttons.Set(NetworkInputData.JUMP, _jumpPressed);
+
+        _firePressed = false;
+        _jumpPressed = false;
+
         input.Set(data);
     }
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player){Debug.Log("Player Joined");}
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player){ }
+
+    // --- 빈 콜백들 ---
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
@@ -49,5 +64,4 @@ public class NetworkInputHandler : MonoBehaviour, INetworkRunnerCallbacks
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-
 }

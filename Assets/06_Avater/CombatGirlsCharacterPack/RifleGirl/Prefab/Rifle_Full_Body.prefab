@@ -870,7 +870,7 @@ MonoBehaviour:
   defaultEventSetting:
     enabled: 1
     eventName: 'To_Hand_R_Socket, IK_ON_Left_Handle  '
-    monitoredLayers: 0100
+    monitoredLayers: 010000
   showDebugLog: 0
   weaponSlots:
   - name: 

@@ -4167,9 +4167,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 262c1720326b11844ab65d271df04e2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _playerColor: {r: 0, g: 0, b: 0, a: 0}
-  _playerName: 
+  moveSpeed: 5
+  _PlayerColor: {r: 0, g: 0, b: 0, a: 0}
   _PlayerHealth: 0
+  _PlayerName:
+    _length: 0
+    _data:
+      Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!1 &4016012970619486408
 GameObject:
   m_ObjectHideFlags: 0
@@ -4196,7 +4200,7 @@ Transform:
   m_GameObject: {fileID: 4016012970619486408}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.00000009362675, w: 1}
-  m_LocalPosition: {x: -0.000000018231399, y: 0.000000029129033, z: -0.000000016591883}
+  m_LocalPosition: {x: -0.000000018231399, y: 0.000000029129033, z: -0.000000016591882}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8487,7 +8491,7 @@ Transform:
   m_GameObject: {fileID: 8316415717836242160}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -1,45 +1,69 @@
 using UnityEngine;
-using Fusion;
-public class CameraControlScript : MonoBehaviour
-{
-    private float rotateX = 0;
-    private float rotateY = 0;
-    public GameObject WaitingUI;
-    private Vector3 Offsets = new Vector3(0, 1f, -4f);
 
-    void Start()
+public class CameraController : MonoBehaviour
+{
+    // InputHandler에서 참조할 수 있도록 싱글톤
+    public static CameraController Instance { get; private set; }
+
+    [SerializeField] private float sensitivity = 2f;
+    [SerializeField] private float pitchLimit  = 80f;
+    [SerializeField] private GameObject waitingUI;
+
+    // 외부(InputHandler)에서 읽어가는 회전값
+    public float Yaw   { get; private set; } = 0f;  // 좌우 (플레이어 몸 회전)
+    public float Pitch { get; private set; } = 0f;  // 상하 (카메라만)
+
+    private bool _initialized = false;
+    private Transform _cameraPivot; // 플레이어의 child[1] (머리/눈 위치)
+
+    private void Awake()
     {
-        WaitingUI.SetActive(true);
+        waitingUI.SetActive(true);
+        Instance = this;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible   = false;
     }
 
-    void Update()
+    private void Update()
     {
-        if (PlayerController.localPlayer != null){
-            transform.parent = PlayerController.localPlayer.transform.GetChild(1);
-            WaitingUI.SetActive(false);
-
-            rotateX += Input.mousePositionDelta.x;
-            rotateY += Input.mousePositionDelta.y;
-            if(rotateY > 80f)
-                rotateY = 80f;
-            else if(rotateY < -80f)
-                rotateY = -80f;
-
-            // ✅ NetworkInputHandler에 회전값 전달
-            var inputHandler = PlayerController.localPlayer
-                .GetComponent<NetworkInputHandler>(); // 또는 찾는 방법
-            // rotationY 공유를 위해 static 사용
-            NetworkInputHandler.rotationY = rotateX;
-
-            // ✅ 카메라 위치/회전은 카메라가 직접 계산
-            Vector3 targetPos = PlayerController.localPlayer.transform.position
-                + transform.parent.up * Offsets.y
-                + transform.parent.forward * Offsets.z;
-
-            transform.position = targetPos;
-            transform.rotation = PlayerController.localPlayer.transform.GetChild(1).rotation;
-            transform.parent.localRotation = Quaternion.Euler(-rotateY, 0, 0);
-
+        // 로컬 플레이어 생성 전까지 대기
+        if (!_initialized)
+        {
+            if (PlayerController.localPlayer == null) return;
+            InitCamera();
         }
+
+        HandleMouseInput();
+        ApplyPitchToCamera();
+    }
+
+    private void InitCamera()
+    {
+        _cameraPivot = PlayerController.localPlayer.transform.GetChild(1);
+
+        // 부모 설정은 딱 한 번만
+        waitingUI.SetActive(false);
+        transform.SetParent(_cameraPivot);
+        transform.GetChild(2).gameObject.SetActive(false);
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+
+        waitingUI.SetActive(false);
+        _initialized = true;
+    }
+
+    private void HandleMouseInput()
+    {
+        // GetAxisRaw 사용 → Project Settings > Input에서 감도 조절 가능
+        Yaw   += Input.GetAxisRaw("Mouse X") * sensitivity;
+        Pitch -= Input.GetAxisRaw("Mouse Y") * sensitivity; // -: 마우스 위 = 위를 봄
+        Pitch  = Mathf.Clamp(Pitch, -pitchLimit, pitchLimit);
+    }
+
+    private void ApplyPitchToCamera()
+    {
+        // 상하 회전(Pitch)만 카메라 피벗에 적용
+        // Yaw(좌우)는 플레이어 몸체가 FixedUpdateNetwork에서 처리
+        _cameraPivot.localRotation = Quaternion.Euler(Pitch, 0f, 0f);
     }
 }
