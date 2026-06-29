@@ -44,7 +44,7 @@ public class CameraController : MonoBehaviour
         // 부모 설정은 딱 한 번만
         waitingUI.SetActive(false);
         transform.SetParent(_cameraPivot);
-        transform.GetChild(2).gameObject.SetActive(false);
+        transform.parent.parent.GetChild(2).gameObject.SetActive(false);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
 
