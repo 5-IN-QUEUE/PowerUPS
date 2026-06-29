@@ -920,7 +920,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1292517043}
   - component: {fileID: 1292517046}
-  - component: {fileID: 1292517045}
   - component: {fileID: 1292517044}
   m_Layer: 3
   m_Name: Camera
@@ -988,14 +987,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!81 &1292517045
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292517042}
-  m_Enabled: 1
 --- !u!20 &1292517046
 Camera:
   m_ObjectHideFlags: 0
@@ -1029,7 +1020,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 60
+  field of view: 80
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -2243,7 +2234,7 @@ Transform:
   m_GameObject: {fileID: 2128449055}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4917,20 +4908,6 @@ Transform:
   - {fileID: 8234236948866322402}
   m_Father: {fileID: 141392554002013900}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2377058523389819683
-MonoBehaviour:
-  m_ObjectHideFlags: 59
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4575010847526300572}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1541381998, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObjectPrefabData
-  Guid:
-    RawGuidValue: 9e0c93958847b8b459caf5acf8aeb017
 --- !u!1 &2404965133470609731
 GameObject:
   m_ObjectHideFlags: 0
@@ -6671,7 +6648,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 807969155115548671}
-  - component: {fileID: 2377058523389819683}
   m_Layer: 3
   m_Name: PlayerLayer
   m_TagString: Untagged
