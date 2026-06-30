@@ -105,9 +105,9 @@ public class PowerUpManager : NetworkBehaviour
             var ctrl0 = obj0.GetComponent<PlayerController>();
             var powerUp0 = powerUpCandidates[Player0SelectedIndex];
             
-            if (ctrl0 != null && powerUp0 != null && powerUp0.Effect != null)
+            if (ctrl0 != null && powerUp0 != null)
             {
-                powerUp0.Effect.Apply(ctrl0);
+                powerUp0.Apply(ctrl0);
                 RPC_NotifyPowerUpApplied(player0, powerUp0.powerUpName, powerUp0.description);
             }
         }
@@ -118,9 +118,9 @@ public class PowerUpManager : NetworkBehaviour
             var ctrl1 = obj1.GetComponent<PlayerController>();
             var powerUp1 = powerUpCandidates[Player1SelectedIndex];
             
-            if (ctrl1 != null && powerUp1 != null && powerUp1.Effect != null)
+            if (ctrl1 != null && powerUp1 != null)
             {
-                powerUp1.Effect.Apply(ctrl1);
+                powerUp1.Apply(ctrl1);
                 RPC_NotifyPowerUpApplied(player1, powerUp1.powerUpName, powerUp1.description);
             }
         }

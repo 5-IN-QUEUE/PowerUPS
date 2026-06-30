@@ -21,11 +21,13 @@ public class PlayerController : NetworkBehaviour
     [Networked] private float FireRateMultiplier { get; set; }
     [Networked] private float SpeedMultiplier { get; set; }
     [Networked] private int MaxHealthPoints { get; set; }
+    [Networked] private int Pellets { get; set; }
 
     private void Awake()
     {
         _ncc     = GetComponent<NetworkCharacterController>();
         _nameTag = transform.GetChild(0).GetComponent<TextMesh>();
+        Pellets = 1;
     }
 
     public override void Spawned()
@@ -140,7 +142,12 @@ public class PlayerController : NetworkBehaviour
         
         Debug.Log($"[PowerUp] Max health increased to {MaxHealthPoints}");
     }
-
+    public void IncreasePellets(int amount){
+        if (!HasStateAuthority) return;
+        
+        Pellets += amount;
+        Debug.Log($"[PowerUp] Speed multiplier: {SpeedMultiplier}");
+    }
     public void IncreaseSpeed(float amount)
     {
         if (!HasStateAuthority) return;

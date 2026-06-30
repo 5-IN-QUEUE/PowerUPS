@@ -275,7 +275,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 12
+  m_text: '30
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d34b2b780821d4048955148c719ebed2, type: 2}
   m_sharedMaterial: {fileID: -3773283459185043515, guid: d34b2b780821d4048955148c719ebed2, type: 2}
@@ -766,8 +768,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -40}
-  m_SizeDelta: {x: 460, y: 260}
+  m_AnchoredPosition: {x: 2, y: -42}
+  m_SizeDelta: {x: 465.5995, y: 157.66}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2439199479504563328
 CanvasRenderer:
@@ -797,8 +799,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9e7868246d0704b7badf66d0af30e114, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 24e15fb1a0b6e4b9e90f358f7152c65e, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1637,6 +1639,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a766c74a4d0c84de6a2239c9c6ea7f08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  ammoText: {fileID: 2218082022339240709}
+  ammoMaxText: {fileID: 2588314743649752826}
+  hpText: {fileID: 2834928649369983771}
+  weaponIMG: {fileID: 4304950516171745683}
+  roundEndPanel: {fileID: 0}
+  roundResultText: {fileID: 0}
+  roundScoreText: {fileID: 0}
+  matchEndPanel: {fileID: 0}
+  matchResultText: {fileID: 0}
+  matchFinalScoreText: {fileID: 0}
+  restartButton: {fileID: 0}
+  exitButton: {fileID: 0}
 --- !u!223 &6514774434608506214
 Canvas:
   m_ObjectHideFlags: 0

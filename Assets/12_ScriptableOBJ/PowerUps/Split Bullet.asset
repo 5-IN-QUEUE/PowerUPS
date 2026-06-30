@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c063788c823e34bd7b7b0632f98aadb2, type: 3}
+  m_Name: Split Bullet
+  m_EditorClassIdentifier: Assembly-CSharp::PowerUpData
+  powerUpName: Split Bullet
+  description: a single fire makes two bullets
+  icon: {fileID: 21300000, guid: c93434619154e49bda414ea9186e222c, type: 3}
+  damageIncrease: -2
+  healthIncrease: 0
+  fireRateMultiplier: 1
+  speedIncrease: 0
+  pelletIncrease: 1
+  ricochetIncrease: 0
+  accuracyChange: 0.1
+  bulletSpeedMultiplier: 1
