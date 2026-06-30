@@ -106,6 +106,15 @@ public class GameFlowManager : NetworkBehaviour
     }
 
     /// <summary>
+    /// UpgradeCardSelect UI에서 카드 선택 완료 시 PowerUpManager로 전달
+    /// </summary>
+    public void OnCardSelected(int index)
+    {
+        if (PowerUpManager.Instance != null)
+            PowerUpManager.Instance.OnCardConfirmed(index);
+    }
+
+    /// <summary>
     /// AugmentSelect에서 양 플레이어가 선택 완료 시 호출 (PowerUpManager에서)
     /// </summary>
     public void OnAugmentSelectComplete()

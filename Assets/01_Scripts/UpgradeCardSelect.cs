@@ -158,6 +158,10 @@ public class UpgradeCardSelect : MonoBehaviour
     {
         Debug.Log($"[UpgradeCardSelect] Card confirmed: {currentIdx}");
         OnCardConfirmed?.Invoke(currentIdx);
+
+        if (PowerUpManager.Instance != null)
+            PowerUpManager.Instance.OnCardConfirmed(currentIdx);
+
         gameObject.SetActive(false);
     }
 }
