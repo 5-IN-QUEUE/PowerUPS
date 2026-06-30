@@ -49,11 +49,22 @@ public class NetworkLauncher : MonoBehaviour, INetworkRunnerCallbacks
         _runner.ProvideInput = true;
 
         _runner.AddCallbacks(this);
-        _runner.AddCallbacks(GetComponent<NetworkInputHandler>());
-        _runner.AddCallbacks(GetComponent<PlayerSpawner>());
-        _runner.AddCallbacks(GetComponent<MatchManager>());
+        // GetComponent가 null을 반환하면 AddCallbacks(null)이 콜백 리스트에 그대로 들어가고,
+        // Fusion이 나중에 그 항목을 호출하는 시점에 NullReferenceException이 터진다.
+        // 이 오브젝트에 실제로 붙어있는 컴포넌트만 등록한다.
+        AddCallbacksIfPresent<NetworkInputHandler>();
+        AddCallbacksIfPresent<PlayerSpawner>();
+        AddCallbacksIfPresent<MatchManager>();
 
         await _runner.JoinSessionLobby(SessionLobby.ClientServer);
+    }
+
+    private void AddCallbacksIfPresent<T>() where T : Component, INetworkRunnerCallbacks
+    {
+        if (TryGetComponent<T>(out var callback))
+            _runner.AddCallbacks(callback);
+        else
+            Debug.LogWarning($"[NetworkLauncher] {typeof(T).Name} 컴포넌트가 이 오브젝트에 없어서 콜백 등록을 건너뜁니다.");
     }
 
     // ==================== 방 생성 / 입장 ====================
