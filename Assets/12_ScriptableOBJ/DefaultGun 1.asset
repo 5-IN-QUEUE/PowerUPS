@@ -19,3 +19,5 @@ MonoBehaviour:
   reloadSpeed: 1
   pellet: 1
   accuracy: 0.01
+  FireSound: {fileID: 8300000, guid: d1aecf8e9c4b0468fbf29a9349c91b9f, type: 3}
+  GunIMG: {fileID: 21300000, guid: 24e15fb1a0b6e4b9e90f358f7152c65e, type: 3}

@@ -8,6 +8,8 @@ public class UpgradeCardSelect : MonoBehaviour
 
     public float animDuration;
 
+    public event System.Action<int> OnCardConfirmed;
+
     private struct TextLayout
     {
         public Vector2 anchoredPos;
@@ -70,6 +72,12 @@ public class UpgradeCardSelect : MonoBehaviour
         {
             currentIdx = (currentIdx + 1) % 4;
             UpdateLayout(animated: true);
+        }
+
+        // 엔터 키로 카드 확정
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            ConfirmCard();
         }
     }
 
@@ -144,5 +152,12 @@ public class UpgradeCardSelect : MonoBehaviour
 
         ApplyLayout(card, targetLayout);
         animatingCount--;
+    }
+
+    public void ConfirmCard()
+    {
+        Debug.Log($"[UpgradeCardSelect] Card confirmed: {currentIdx}");
+        OnCardConfirmed?.Invoke(currentIdx);
+        gameObject.SetActive(false);
     }
 }

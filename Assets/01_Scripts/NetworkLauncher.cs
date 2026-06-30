@@ -13,12 +13,14 @@ public class NetworkLauncher : MonoBehaviour
 
         _runner.AddCallbacks(GetComponent<NetworkInputHandler>());
         _runner.AddCallbacks(GetComponent<PlayerSpawner>());
+        _runner.AddCallbacks(GetComponent<MatchManager>());
 
         await _runner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.AutoHostOrClient,
             SessionName = "Test",
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+            PlayerCount = 2  // 최대 2명 제한
         });
     }
 }

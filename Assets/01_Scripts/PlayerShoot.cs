@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerShoot : NetworkBehaviour
 {
     [SerializeField] private GunData       stats;
+    public GunData Stats => stats;
     [SerializeField] private NetworkObject bulletPrefab;
     [SerializeField] private Transform     muzzlePoint;
 
@@ -14,6 +15,10 @@ public class PlayerShoot : NetworkBehaviour
     [Networked] public bool      IsReloading { get; private set; }
     [Networked] private TickTimer ReloadTimer { get; set; }
     [Networked] private TickTimer FireTimer   { get; set; }
+    
+    // PowerUp 시스템 추가
+    [Networked] private float DamageMultiplier { get; set; }
+    [Networked] private float FireRateMultiplier { get; set; }
 
     private ChangeDetector _changes;
 
@@ -21,7 +26,11 @@ public class PlayerShoot : NetworkBehaviour
     {
         _changes = GetChangeDetector(ChangeDetector.Source.SimulationState);
         if (HasStateAuthority)
+        {
             Ammo = GunData.MaxAmmo;
+            DamageMultiplier = 1f;
+            FireRateMultiplier = 1f;
+        }
     }
 
     public override void FixedUpdateNetwork()
@@ -39,7 +48,7 @@ public class PlayerShoot : NetworkBehaviour
             if (HasStateAuthority)
             {
                 IsReloading = true;
-                ReloadTimer = TickTimer.CreateFromSeconds(Runner, 2f / stats.reloadSpeed);
+                ReloadTimer = TickTimer.CreateFromSeconds(Runner, 1f / stats.reloadSpeed);
             }
         }
 
@@ -48,7 +57,7 @@ public class PlayerShoot : NetworkBehaviour
         {
             if (HasStateAuthority)
             {
-                FireTimer = TickTimer.CreateFromSeconds(Runner, 1f / stats.fireRate);
+                FireTimer = TickTimer.CreateFromSeconds(Runner, 1f / (stats.fireRate * FireRateMultiplier));
                 Vector3 aimDir = Quaternion.Euler(data.rotationX, data.rotationY, 0) * Vector3.forward;
                 for (int i = 0; i < stats.pellet; i++)
                     SpawnBullet(aimDir);
@@ -64,6 +73,16 @@ public class PlayerShoot : NetworkBehaviour
             if (change == nameof(IsReloading) && IsReloading)
                 OnReloadStart?.Invoke();
         }
+    }
+
+    // 라운드 재시작 시 서버에서 호출
+    public void ResetGun()
+    {
+        if (!HasStateAuthority) return;
+        Ammo        = GunData.MaxAmmo;
+        IsReloading = false;
+        ReloadTimer = default;
+        FireTimer   = default;
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
@@ -85,18 +104,36 @@ public class PlayerShoot : NetworkBehaviour
             ? muzzlePoint.position
             : transform.position + transform.forward * 0.6f + Vector3.up * 1.4f;
 
+        float finalDamage = stats.damage * DamageMultiplier;
+
         Runner.Spawn(
             bulletPrefab,
             spawnPos,
             Quaternion.LookRotation(dir),
             Object.InputAuthority,
             (runner, obj) => obj.GetComponent<BulletScript>().Init(
-                stats.damage,
+                finalDamage,
                 stats.bulletSpeed,
                 stats.bounceCount,
                 Object.InputAuthority,
                 dir
             )
         );
+    }
+
+    // ==================== PowerUp 효과 메서드 ====================
+
+    public void ApplyDamageMultiplier(int flatIncrease)
+    {
+        if (!HasStateAuthority) return;
+        DamageMultiplier += (flatIncrease / (float)stats.damage);
+        Debug.Log($"[PlayerShoot] Damage multiplier: {DamageMultiplier}");
+    }
+
+    public void ApplyFireRateMultiplier(float multiplier)
+    {
+        if (!HasStateAuthority) return;
+        FireRateMultiplier *= multiplier;
+        Debug.Log($"[PlayerShoot] Fire rate multiplier: {FireRateMultiplier}");
     }
 }

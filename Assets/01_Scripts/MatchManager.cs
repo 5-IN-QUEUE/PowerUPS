@@ -2,52 +2,71 @@ using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
+public class MatchManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    [SerializeField] private NetworkPrefabRef _playerPrefab;
-    private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+    public static MatchManager Instance { get; private set; }
+    
+    [SerializeField] private GameObject waitingUI; // "상대를 기다리는 중..." UI
     
     private NetworkRunner _runner;
+    private bool _matchStarted = false;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else { Destroy(gameObject); return; }
+    }
+
+    private void Start()
+    {
+        if (waitingUI != null)
+            waitingUI.SetActive(true);
+    }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         _runner = runner;
         
-        if (runner.IsServer)
+        Debug.Log($"[MatchManager] Player joined: {player}, Active players: {runner.ActivePlayers.Count()}");
+        
+        // 2명 모두 접속 시에만 게임 시작
+        if (runner.ActivePlayers.Count() >= 2 && !_matchStarted)
         {
-            Vector3 spawnPosition = new Vector3(0, 8, 0);
-            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
-            _spawnedCharacters.Add(player, networkPlayerObject);
+            _matchStarted = true;
+            Debug.Log("[MatchManager] 2 players detected. Starting game...");
             
-            Debug.Log($"[PlayerSpawner] Player {player} spawned at {spawnPosition}");
+            if (waitingUI != null)
+                waitingUI.SetActive(false);
+            
+            // GameFlowManager에 게임 시작 신호 전송
+            GameFlowManager gfm = FindObjectOfType<GameFlowManager>();
+            if (gfm != null)
+            {
+                gfm.StartMatch();
+            }
+            else
+            {
+                Debug.LogWarning("[MatchManager] GameFlowManager not found!");
+            }
         }
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
-        {
-            runner.Despawn(networkObject);
-            _spawnedCharacters.Remove(player);
-        }
-    }
-
-    public void OnSceneLoadDone(NetworkRunner runner)
-    {
-        Debug.Log("[PlayerSpawner] Scene load done");
+        Debug.Log($"[MatchManager] Player left: {player}");
+        _matchStarted = false;
         
-        // GameFlowManager에 씬 로드 완료 신호 전송
-        var gfm = FindObjectOfType<GameFlowManager>();
-        if (gfm != null && gfm.HasStateAuthority)
-        {
-            gfm.OnSceneLoadComplete();
-        }
+        if (waitingUI != null)
+            waitingUI.SetActive(true);
     }
 
-    public void OnSceneLoadStart(NetworkRunner runner) { }
+    // 세션 최대 플레이어 수 제한은 NetworkRunner의 GameMode 설정에서 관리
+    // 참고: StartGameArgs에서 PlayerCount = 2로 설정 필요
 
+    #region INetworkRunnerCallbacks (빈 구현)
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
@@ -59,8 +78,11 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+    public void OnSceneLoadDone(NetworkRunner runner) { }
+    public void OnSceneLoadStart(NetworkRunner runner) { }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
+    #endregion
 }

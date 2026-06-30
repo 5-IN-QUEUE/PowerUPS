@@ -44,7 +44,7 @@ public class BulletScript : NetworkBehaviour
             if (player != null && player.Object.InputAuthority != Shooter)
             {
                 // 적 명중
-                player.TakeDamage((int)Damage);
+                player.TakeDamage((int)Damage, Shooter);
 
                 // 히트마커 RPC → 발사한 플레이어 클라이언트로 전송
                 if (Runner.TryGetPlayerObject(Shooter, out var shooterObj))
