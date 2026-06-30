@@ -51,6 +51,7 @@ public class NetworkLauncher : MonoBehaviour, INetworkRunnerCallbacks
         _runner.AddCallbacks(this);
         _runner.AddCallbacks(GetComponent<NetworkInputHandler>());
         _runner.AddCallbacks(GetComponent<PlayerSpawner>());
+        _runner.AddCallbacks(GetComponent<MatchManager>());
 
         await _runner.JoinSessionLobby(SessionLobby.ClientServer);
     }

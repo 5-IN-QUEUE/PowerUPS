@@ -12,13 +12,20 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     // 빈 오브젝트를 두면 런타임에 이름으로 찾는다.
     [SerializeField] private string _spawnPointNamePrefix = "SpawnPoint_";
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+    
+    private NetworkRunner _runner;
+
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        if (runner.IsServer){
+        _runner = runner;
+        
+        if (runner.IsServer)
+        {
             Vector3 spawnPosition = GetSpawnPosition(_spawnedCharacters.Count);
             NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
             _spawnedCharacters.Add(player, networkPlayerObject);
-
+            
+            Debug.Log($"[PlayerSpawner] Player {player} spawned at {spawnPosition}");
         }
     }
 
@@ -28,6 +35,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         if (point != null) return point.transform.position;
         return new Vector3(0, 8, 0);
     }
+
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
@@ -36,8 +44,22 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             _spawnedCharacters.Remove(player);
         }
     }
-    public void OnInput(NetworkRunner runner, NetworkInput input){
+
+    public void OnSceneLoadDone(NetworkRunner runner)
+    {
+        Debug.Log("[PlayerSpawner] Scene load done");
+        
+        // GameFlowManager에 씬 로드 완료 신호 전송
+        var gfm = FindObjectOfType<GameFlowManager>();
+        if (gfm != null && gfm.HasStateAuthority)
+        {
+            gfm.OnSceneLoadComplete();
+        }
     }
+
+    public void OnSceneLoadStart(NetworkRunner runner) { }
+
+    public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
@@ -48,8 +70,6 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-    public void OnSceneLoadDone(NetworkRunner runner) { }
-    public void OnSceneLoadStart(NetworkRunner runner) { }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }

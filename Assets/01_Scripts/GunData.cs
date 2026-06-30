@@ -1,3 +1,4 @@
+using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Game/GunData", fileName = "NewGunData")]
@@ -12,4 +13,6 @@ public class GunData : ScriptableObject
     public float reloadSpeed = 1f;   // 배율. 2f = 2배 빠른 재장전
     public int   pellet      = 1;
     public float accuracy    = 0.01f; // 퍼짐 반경 (작을수록 정확)
+    public AudioClip FireSound;
+    public Sprite GunIMG;
 }

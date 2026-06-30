@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     public void StartButtonOnClick()
     {
         SoundManager.instance.PlaySFX("UIClick");
-        SceneManager.LoadScene("InGameScene");
+        SceneManager.LoadScene("FactorialScene");
     }
 
     public void QuitButtonOnClick()
