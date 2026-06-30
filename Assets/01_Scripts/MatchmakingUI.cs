@@ -22,8 +22,10 @@ public class MatchmakingUI : MonoBehaviour
 
         NetworkLauncher.Instance.OnMatchStateChanged += HandleStateChanged;
         NetworkLauncher.Instance.OnPlayerCountChanged += HandlePlayerCountChanged;
+        NetworkLauncher.Instance.OnLobbyReadyChanged += HandleLobbyReadyChanged;
 
         HandleStateChanged(NetworkLauncher.Instance.State);
+        HandleLobbyReadyChanged(NetworkLauncher.Instance.IsLobbyReady);
     }
 
     private void OnDestroy()
@@ -31,6 +33,24 @@ public class MatchmakingUI : MonoBehaviour
         if (NetworkLauncher.Instance == null) return;
         NetworkLauncher.Instance.OnMatchStateChanged -= HandleStateChanged;
         NetworkLauncher.Instance.OnPlayerCountChanged -= HandlePlayerCountChanged;
+        NetworkLauncher.Instance.OnLobbyReadyChanged -= HandleLobbyReadyChanged;
+    }
+
+    // 서버(로비) 연결이 끝나기 전엔 버튼을 막아서, 연결 중에 누르면 생기는 매칭 실패를 막는다.
+    private void HandleLobbyReadyChanged(bool ready)
+    {
+        if (!ready)
+        {
+            makeRoomButton.interactable = false;
+            SetStatusText("서버에 연결하는 중...");
+            return;
+        }
+
+        if (NetworkLauncher.Instance.State == NetworkLauncher.MatchState.Idle)
+        {
+            makeRoomButton.interactable = true;
+            SetStatusText("");
+        }
     }
 
     private void HandleStateChanged(NetworkLauncher.MatchState state)
@@ -39,7 +59,7 @@ public class MatchmakingUI : MonoBehaviour
         {
             case NetworkLauncher.MatchState.Idle:
                 if (searchingPanel != null) searchingPanel.SetActive(false);
-                makeRoomButton.interactable = true;
+                makeRoomButton.interactable = NetworkLauncher.Instance.IsLobbyReady;
                 roomNameInput.interactable = true;
                 break;
 
@@ -57,7 +77,7 @@ public class MatchmakingUI : MonoBehaviour
 
             case NetworkLauncher.MatchState.Failed:
                 if (searchingPanel != null) searchingPanel.SetActive(false);
-                makeRoomButton.interactable = true;
+                makeRoomButton.interactable = NetworkLauncher.Instance.IsLobbyReady;
                 roomNameInput.interactable = true;
                 if (cancelButton != null) cancelButton.interactable = true;
                 SetStatusText("방 입장/생성에 실패했습니다. 다시 시도해주세요.");

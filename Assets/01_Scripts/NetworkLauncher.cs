@@ -18,12 +18,18 @@ public class NetworkLauncher : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private float _matchFoundDelay = 1.5f; // "매칭 완료!" 문구를 보여줄 시간
 
     private NetworkRunner _runner;
+    private bool _lobbyReady = false;
 
     public MatchState State { get; private set; } = MatchState.Idle;
+    public bool IsLobbyReady => _lobbyReady;
     public string CurrentRoomName { get; private set; }
+    // OnSessionListUpdated는 목록이 "바뀔 때만" 오는 푸시 이벤트라서, UI가 늦게 구독하면
+    // 그 사이의 변경을 영영 놓친다. 마지막으로 받은 목록을 캐싱해뒀다가 구독 시점에 즉시 보여준다.
+    public List<SessionInfo> CurrentSessionList { get; private set; } = new List<SessionInfo>();
     public event Action<MatchState> OnMatchStateChanged;
     public event Action<int, int> OnPlayerCountChanged; // (현재 인원, 필요 인원)
     public event Action<List<SessionInfo>> OnRoomListUpdated;
+    public event Action<bool> OnLobbyReadyChanged;
 
     private void Awake()
     {
@@ -45,6 +51,10 @@ public class NetworkLauncher : MonoBehaviour, INetworkRunnerCallbacks
 
     private async void ConnectToLobby()
     {
+        _lobbyReady = false;
+        CurrentSessionList = new List<SessionInfo>();
+        OnLobbyReadyChanged?.Invoke(false);
+
         _runner = Instantiate(_networkRunnerPrefab);
         _runner.ProvideInput = true;
 
@@ -56,7 +66,19 @@ public class NetworkLauncher : MonoBehaviour, INetworkRunnerCallbacks
         AddCallbacksIfPresent<PlayerSpawner>();
         AddCallbacksIfPresent<MatchManager>();
 
-        await _runner.JoinSessionLobby(SessionLobby.ClientServer);
+        // JoinSessionLobby가 끝나기 전(NameServer -> Master 연결 중)에 StartGame을 보내면
+        // "Operation JoinOrCreateRoom not allowed on current server (NameServer)" 에러가 난다.
+        // 반드시 이 await가 끝난 뒤에만 방 생성/입장을 허용해야 한다.
+        var result = await _runner.JoinSessionLobby(SessionLobby.ClientServer);
+
+        if (!result.Ok)
+        {
+            Debug.LogError($"[NetworkLauncher] 로비 연결 실패: {result.ShutdownReason}");
+            return;
+        }
+
+        _lobbyReady = true;
+        OnLobbyReadyChanged?.Invoke(true);
     }
 
     private void AddCallbacksIfPresent<T>() where T : Component, INetworkRunnerCallbacks
@@ -81,7 +103,7 @@ public class NetworkLauncher : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        if (_runner == null)
+        if (_runner == null || !_lobbyReady)
         {
             Debug.LogWarning("[NetworkLauncher] 아직 로비에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.");
             return;
@@ -190,6 +212,7 @@ public class NetworkLauncher : MonoBehaviour, INetworkRunnerCallbacks
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
         if (runner != _runner) return;
+        CurrentSessionList = sessionList;
         OnRoomListUpdated?.Invoke(sessionList);
     }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }

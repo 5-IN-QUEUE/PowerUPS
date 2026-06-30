@@ -11,17 +11,25 @@ public class RoomListUI : MonoBehaviour
 
     private readonly List<RoomListItem> _items = new List<RoomListItem>();
 
-    private void Start()
+    // 탭을 닫았다 다시 여는 식으로 이 패널이 SetActive(false/true) 되는 UI일 수 있으므로
+    // Start/OnDestroy 대신 OnEnable/OnDisable을 써서 다시 열릴 때마다 최신 목록을 즉시 그린다.
+    private void OnEnable()
     {
+        if (NetworkLauncher.Instance == null) return;
+
         NetworkLauncher.Instance.OnRoomListUpdated += HandleRoomListUpdated;
         NetworkLauncher.Instance.OnMatchStateChanged += HandleMatchStateChanged;
+
+        // 구독하기 전에 이미 와있던 목록(캐시)을 즉시 반영 - 안 그러면 변경 이벤트가 다시 안 올 때까지 빈 목록으로 남는다.
+        HandleRoomListUpdated(NetworkLauncher.Instance.CurrentSessionList);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         if (NetworkLauncher.Instance == null) return;
         NetworkLauncher.Instance.OnRoomListUpdated -= HandleRoomListUpdated;
         NetworkLauncher.Instance.OnMatchStateChanged -= HandleMatchStateChanged;
+        Clear();
     }
 
     private void HandleMatchStateChanged(NetworkLauncher.MatchState state)
