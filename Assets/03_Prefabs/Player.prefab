@@ -4008,6 +4008,7 @@ MonoBehaviour:
   moveSpeed: 5
   _PlayerColor: {r: 0, g: 0, b: 0, a: 0}
   _PlayerHealth: 0
+  _Score: 0
   _PlayerName:
     _length: 0
     _data:
@@ -4027,8 +4028,8 @@ MonoBehaviour:
   stats: {fileID: 11400000, guid: da7e00467aabf41cdb7fcffdf6203c23, type: 2}
   bulletPrefab: {fileID: -4771264480872529014, guid: cad3f06ed37274ab79275d65440dfb65, type: 3}
   muzzlePoint: {fileID: 3942754025278330847}
-  anim: {fileID: 893406120844598610}
   _Ammo: 0
+  _IsReloading: 0
 --- !u!1 &4016012970619486408
 GameObject:
   m_ObjectHideFlags: 0
@@ -5622,7 +5623,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5679893056101008423}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
