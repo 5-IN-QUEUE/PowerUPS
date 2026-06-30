@@ -11,7 +11,8 @@ public struct NetworkInputData : INetworkInput
     public const int AIM          = 4;
 
     public float     rotationY;   // 플레이어 몸 좌우 회전 (Yaw)
-    public Vector3   direction;   // 이동 방향 (WASD) - moveDirection 제거
+    public float     rotationX;   // 카메라 상하 회전 (Pitch) - 총알 방향에 사용
+    public Vector3   direction;   // 이동 방향 (WASD)
     public NetworkButtons buttons;
     // Jump, Fire 등 모든 버튼은 buttons 안으로
 }

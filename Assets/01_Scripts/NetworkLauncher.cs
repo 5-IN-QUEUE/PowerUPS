@@ -5,7 +5,7 @@ public class NetworkLauncher : MonoBehaviour
 {
     private NetworkRunner _runner;
     [SerializeField] private NetworkRunner _networkRunnerPrefab;
-
+    
     public async void Start()
     {
         _runner = Instantiate(_networkRunnerPrefab);

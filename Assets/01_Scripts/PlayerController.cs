@@ -37,7 +37,7 @@ public class PlayerController : NetworkBehaviour
                 Random.Range(0f, 1f),
                 Random.Range(0f, 1f)
             );
-            PlayerHealth = 100;
+            PlayerHealth = 150;
             PlayerName   = $"Player{Random.Range(0, 999999)}";
         }
 
@@ -93,13 +93,14 @@ public class PlayerController : NetworkBehaviour
     {
         if (!GetInput(out NetworkInputData data)) return;
 
-        // 회전
         var rot = Quaternion.Euler(0, data.rotationY, 0);
-        transform.rotation = rot;
 
-        // 이동
+        // 이동 먼저 (NCC가 내부에서 rotation을 건드릴 수 있음)
         Vector3 moveDir = rot * data.direction.normalized;
         _ncc.Move(moveDir * moveSpeed * Runner.DeltaTime);
+
+        // Move 이후에 덮어써서 NCC 자동회전 방지
+        transform.rotation = rot;
 
         // 점프 (NetworkButtons로 누락 없이 처리)
         if (data.buttons.IsSet(NetworkInputData.JUMP))

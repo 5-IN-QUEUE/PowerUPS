@@ -6,14 +6,17 @@ using UnityEngine;
 
 public class NetworkInputHandler : MonoBehaviour, INetworkRunnerCallbacks
 {
-    private bool _firePressed = false;
-    private bool _jumpPressed = false;
+    private bool _firePressed  = false;
+    private bool _jumpPressed  = false;
+    private bool _reloadPressed = false;
 
-    // NetworkInputHandler.cs
+    public static event System.Action OnFireInput;
+
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0)) _firePressed = true;
-        if (Input.GetKeyDown(KeyCode.Space)) _jumpPressed = true;  // ✅ Down으로 수집
+        if (Input.GetMouseButtonDown(0))       _firePressed   = true;
+        if (Input.GetKeyDown(KeyCode.Space))   _jumpPressed   = true;
+        if (Input.GetKeyDown(KeyCode.R))       _reloadPressed = true;
     }
     // NetworkInputHandler.cs
     public void OnInput(NetworkRunner runner, NetworkInput input)
@@ -34,13 +37,20 @@ public class NetworkInputHandler : MonoBehaviour, INetworkRunnerCallbacks
         if (Input.GetKey(KeyCode.D)) data.direction += Vector3.right;
 
         if (CameraController.Instance != null)
+        {
             data.rotationY = CameraController.Instance.Yaw;
+            data.rotationX = CameraController.Instance.Pitch;
+        }
 
-        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, _firePressed);
-        data.buttons.Set(NetworkInputData.JUMP, _jumpPressed);
+        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, Input.GetMouseButton(0));
+        data.buttons.Set(NetworkInputData.JUMP,         _jumpPressed);
+        data.buttons.Set(NetworkInputData.RELOAD,       _reloadPressed);
 
-        _firePressed = false;
-        _jumpPressed = false;
+        if (_firePressed) OnFireInput?.Invoke();
+
+        _firePressed   = false;
+        _jumpPressed   = false;
+        _reloadPressed = false;
 
         input.Set(data);
     }
