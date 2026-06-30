@@ -65,11 +65,12 @@ public class GameFlowManager : NetworkBehaviour
                     SelectTimer = TickTimer.CreateFromSeconds(Runner, AUGMENT_SELECT_DURATION);
                 }
                 
-                if (SelectTimer.Expired(Runner))
+                if (SelectTimer.Expired(Runner) && !SelectTimeoutOccurred)
                 {
-                    // 타이머 만료 시 미선택 플레이어 자동 선택
                     SelectTimeoutOccurred = true;
-                    // 실제 자동 선택 로직은 PowerUpManager에서 처리
+                    SelectTimer = default;
+                    if (PowerUpManager.Instance != null)
+                        PowerUpManager.Instance.HandleSelectionTimeout();
                 }
                 break;
 
@@ -168,6 +169,12 @@ public class GameFlowManager : NetworkBehaviour
 
         GameState oldState = CurrentState;
         CurrentState = newState;
+
+        if (newState == GameState.AugmentSelect)
+        {
+            SelectTimer = default;
+            SelectTimeoutOccurred = false;
+        }
 
         Debug.Log($"[GameFlowManager] State: {oldState} → {newState}");
         RPC_NotifyStateChange(newState);
