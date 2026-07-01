@@ -25,6 +25,8 @@ public class UpgradeCardSelect : MonoBehaviour
         public TextLayout descLayout;
     }
 
+    public static bool IsSelecting { get; private set; } = false;
+
     private CardLayout[] slotLayouts = new CardLayout[4];
     private int currentIdx = 0;
     private int animatingCount = 0;
@@ -66,10 +68,21 @@ public class UpgradeCardSelect : MonoBehaviour
             _layoutsRecorded = true;
         }
 
+        IsSelecting = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible   = true;
+
         currentIdx = 0;
         StopAllCoroutines();
         animatingCount = 0;
         UpdateLayout(animated: false);
+    }
+
+    void OnDisable()
+    {
+        IsSelecting = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible   = false;
     }
 
     void Update()
