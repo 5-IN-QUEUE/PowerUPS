@@ -69,8 +69,8 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             }
         }
 
-        // GameFlowManager에 씬 로드 완료 신호 전송
-        var gfm = FindObjectOfType<GameFlowManager>();
+        // GameFlowManager에 씬 로드 완료 신호 전송 (비활성 포함 검색)
+        var gfm = FindObjectOfType<GameFlowManager>(true);
         if (gfm == null)
         {
             Debug.LogError("[PlayerSpawner] GameFlowManager를 씬에서 찾을 수 없습니다! " +

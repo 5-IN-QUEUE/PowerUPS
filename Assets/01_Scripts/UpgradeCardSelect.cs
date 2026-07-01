@@ -31,6 +31,7 @@ public class UpgradeCardSelect : MonoBehaviour
     private int currentIdx = 0;
     private int animatingCount = 0;
     private bool _layoutsRecorded = false;
+    private bool _confirmed = false;
 
     void Start() { }
 
@@ -72,6 +73,7 @@ public class UpgradeCardSelect : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible   = true;
 
+        _confirmed = false;
         currentIdx = 0;
         StopAllCoroutines();
         animatingCount = 0;
@@ -87,7 +89,7 @@ public class UpgradeCardSelect : MonoBehaviour
 
     void Update()
     {
-        if (animatingCount > 0) return;
+        if (animatingCount > 0 || _confirmed) return;
 
         if (Input.GetKeyDown(KeyCode.A))
         {
@@ -100,7 +102,6 @@ public class UpgradeCardSelect : MonoBehaviour
             UpdateLayout(animated: true);
         }
 
-        // 엔터 키로 카드 확정
         if (Input.GetKeyDown(KeyCode.Return))
         {
             ConfirmCard();
@@ -182,12 +183,19 @@ public class UpgradeCardSelect : MonoBehaviour
 
     public void ConfirmCard()
     {
+        if (_confirmed) return;
+        _confirmed = true;
+
         Debug.Log($"[UpgradeCardSelect] Card confirmed: {currentIdx}");
         OnCardConfirmed?.Invoke(currentIdx);
 
         if (PowerUpManager.Instance != null)
             PowerUpManager.Instance.OnCardConfirmed(currentIdx);
 
-        gameObject.SetActive(false);
+        // SetActive(false)를 여기서 호출하면 안 됨:
+        // 부모 패널(upgradeCardPanel)이 다음 라운드에 SetActive(true)될 때
+        // 자식인 이 오브젝트는 여전히 inactive 상태라 OnEnable이 호출되지 않아
+        // 2라운드부터 카드 선택이 완전히 죽음.
+        // 패널 숨김은 UIManager가 RoundActive 상태 진입 시 처리한다.
     }
 }

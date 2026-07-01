@@ -39,6 +39,9 @@ public class MatchmakingUI : MonoBehaviour
     // 서버(로비) 연결이 끝나기 전엔 버튼을 막아서, 연결 중에 누르면 생기는 매칭 실패를 막는다.
     private void HandleLobbyReadyChanged(bool ready)
     {
+        // 씬 전환으로 UI 오브젝트가 파괴된 경우 무시
+        if (makeRoomButton == null) return;
+
         if (!ready)
         {
             makeRoomButton.interactable = false;
@@ -55,18 +58,21 @@ public class MatchmakingUI : MonoBehaviour
 
     private void HandleStateChanged(NetworkLauncher.MatchState state)
     {
+        // 씬 전환으로 UI 오브젝트가 파괴된 경우 무시
+        if (makeRoomButton == null) return;
+
         switch (state)
         {
             case NetworkLauncher.MatchState.Idle:
                 if (searchingPanel != null) searchingPanel.SetActive(false);
                 makeRoomButton.interactable = NetworkLauncher.Instance.IsLobbyReady;
-                roomNameInput.interactable = true;
+                if (roomNameInput != null) roomNameInput.interactable = true;
                 break;
 
             case NetworkLauncher.MatchState.Searching:
                 if (searchingPanel != null) searchingPanel.SetActive(true);
                 makeRoomButton.interactable = false;
-                roomNameInput.interactable = false;
+                if (roomNameInput != null) roomNameInput.interactable = false;
                 SetStatusText($"'{NetworkLauncher.Instance.CurrentRoomName}' 방 입장 중...");
                 break;
 
@@ -78,7 +84,7 @@ public class MatchmakingUI : MonoBehaviour
             case NetworkLauncher.MatchState.Failed:
                 if (searchingPanel != null) searchingPanel.SetActive(false);
                 makeRoomButton.interactable = NetworkLauncher.Instance.IsLobbyReady;
-                roomNameInput.interactable = true;
+                if (roomNameInput != null) roomNameInput.interactable = true;
                 if (cancelButton != null) cancelButton.interactable = true;
                 SetStatusText("방 입장/생성에 실패했습니다. 다시 시도해주세요.");
                 break;
