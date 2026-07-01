@@ -40,7 +40,7 @@ public class UpgradeCardSelect : MonoBehaviour
             {
                 worldPos  = upgradeCards[i].position,
                 sizeDelta = upgradeCards[i].sizeDelta,
-                
+
                 nameLayout = new TextLayout
                 {
                     anchoredPos = nameRect.anchoredPosition,
@@ -56,6 +56,17 @@ public class UpgradeCardSelect : MonoBehaviour
             };
         }
 
+        UpdateLayout(animated: false);
+    }
+
+    // UIManager가 SetActive(true)로 패널을 켤 때마다 호출됨
+    // 카드 선택을 처음 상태로 되돌림
+    void OnEnable()
+    {
+        if (slotLayouts == null || slotLayouts.Length == 0) return;
+        currentIdx = 0;
+        StopAllCoroutines();
+        animatingCount = 0;
         UpdateLayout(animated: false);
     }
 

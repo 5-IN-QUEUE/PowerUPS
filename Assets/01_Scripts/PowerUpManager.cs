@@ -31,30 +31,26 @@ public class PowerUpManager : NetworkBehaviour
     /// </summary>
     public void OnCardConfirmed(int selectedIndex)
     {
-        if (!HasInputAuthority) return;
-
-        // StateAuthority에 선택 정보 전송
-        RPC_SubmitCardSelection(selectedIndex);
+        if (Runner == null) return;
+        // 씬 NetworkObject는 InputAuthority가 없으므로 발신자 PlayerRef를 직접 넘긴다
+        RPC_SubmitCardSelection(Runner.LocalPlayer, selectedIndex);
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_SubmitCardSelection(int selectedIndex)
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_SubmitCardSelection(PlayerRef sender, int selectedIndex)
     {
         if (!HasStateAuthority) return;
 
-        var player = Object.InputAuthority;
-        
-        // 플레이어 0 또는 1 인덱스 파악
         List<PlayerRef> activePlayers = new List<PlayerRef>(Runner.ActivePlayers);
         if (activePlayers.Count < 2) return;
 
-        if (activePlayers[0] == player)
+        if (activePlayers[0] == sender)
         {
             Player0Selected = true;
             Player0SelectedIndex = selectedIndex;
             Debug.Log($"[PowerUpManager] Player 0 selected: {selectedIndex}");
         }
-        else if (activePlayers[1] == player)
+        else if (activePlayers[1] == sender)
         {
             Player1Selected = true;
             Player1SelectedIndex = selectedIndex;

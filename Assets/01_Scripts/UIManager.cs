@@ -21,6 +21,9 @@ public class UIManager : MonoBehaviour
     [Header("Loading")]
     [SerializeField] private GameObject loadingPanel;
 
+    [Header("Augment Select")]
+    [SerializeField] private GameObject upgradeCardPanel;
+
     [Header("Match End")]
     [SerializeField] private GameObject matchEndPanel;
     [SerializeField] private TextMeshProUGUI matchResultText;
@@ -127,10 +130,12 @@ public class UIManager : MonoBehaviour
             case GameFlowManager.GameState.AugmentSelect:
                 if (loadingPanel != null) loadingPanel.SetActive(false);
                 if (roundEndPanel != null) roundEndPanel.SetActive(false);
+                if (upgradeCardPanel != null) upgradeCardPanel.SetActive(true);
                 break;
 
             case GameFlowManager.GameState.RoundActive:
                 if (loadingPanel != null) loadingPanel.SetActive(false);
+                if (upgradeCardPanel != null) upgradeCardPanel.SetActive(false);
                 break;
 
             case GameFlowManager.GameState.RoundEnd:
