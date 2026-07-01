@@ -27,7 +27,6 @@ public class PlayerController : NetworkBehaviour
     {
         _ncc     = GetComponent<NetworkCharacterController>();
         _nameTag = transform.GetChild(0).GetComponent<TextMesh>();
-        Pellets = 1;
     }
 
     public override void Spawned()
@@ -45,11 +44,12 @@ public class PlayerController : NetworkBehaviour
             MaxHealthPoints = 150;
             Score        = 0;
             PlayerName   = $"Player{Random.Range(0, 999999)}";
-            
+
             // PowerUp 초기값
             DamageMultiplier = 1f;
             FireRateMultiplier = 1f;
             SpeedMultiplier = 1f;
+            Pellets = 1;
         }
 
         if (HasInputAuthority)

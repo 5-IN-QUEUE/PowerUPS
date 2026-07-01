@@ -48,13 +48,27 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         Debug.Log("[PlayerSpawner] Scene load done");
-        
-        // GameFlowManager에 씬 로드 완료 신호 전송
+        StartCoroutine(TriggerGameFlow());
+    }
+
+    private System.Collections.IEnumerator TriggerGameFlow()
+    {
+        // NetworkBehaviour.Spawned()가 같은 프레임 끝에 완료되도록 2프레임 대기
+        yield return null;
+        yield return null;
+
         var gfm = FindObjectOfType<GameFlowManager>();
-        if (gfm != null && gfm.HasStateAuthority)
+        if (gfm == null)
         {
-            gfm.OnSceneLoadComplete();
+            Debug.LogError("[PlayerSpawner] GameFlowManager를 씬에서 찾을 수 없습니다! " +
+                           "JoPockScene에 NetworkObject + GameFlowManager가 붙은 오브젝트를 추가해주세요.");
+            yield break;
         }
+
+        Debug.Log($"[PlayerSpawner] GameFlowManager 발견. HasStateAuthority={gfm.HasStateAuthority}, State={gfm.CurrentState}");
+
+        if (gfm.HasStateAuthority)
+            gfm.OnSceneLoadComplete();
     }
 
     public void OnSceneLoadStart(NetworkRunner runner) { }
