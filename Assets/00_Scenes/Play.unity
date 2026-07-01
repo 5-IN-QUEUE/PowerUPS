@@ -22486,6 +22486,7 @@ MonoBehaviour:
   roundResultText: {fileID: 1162698273}
   roundScoreText: {fileID: 1202139745}
   loadingPanel: {fileID: 4837333927461385184}
+  upgradeCardPanel: {fileID: 0}
   matchEndPanel: {fileID: 2007831000}
   matchResultText: {fileID: 1433356784}
   matchFinalScoreText: {fileID: 1698389936}
