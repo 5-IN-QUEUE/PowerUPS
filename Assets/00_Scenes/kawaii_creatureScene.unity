@@ -421,7 +421,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetworkLauncher
   _networkRunnerPrefab: {fileID: 8290390901921655168, guid: d10dcb1641cd53145b45abaa563407b1, type: 3}
-  _battleScenePath: Assets/00_Scenes/JoPockScene.unity
+  _battleScenePath: Assets/00_Scenes/Play.unity
   _requiredPlayerCount: 2
   _matchFoundDelay: 1.5
 --- !u!114 &58041568

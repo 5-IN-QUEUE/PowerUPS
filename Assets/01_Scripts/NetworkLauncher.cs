@@ -13,7 +13,7 @@ public class NetworkLauncher : MonoBehaviour, INetworkRunnerCallbacks
     public enum MatchState { Idle, Searching, Found, Failed }
 
     [SerializeField] private NetworkRunner _networkRunnerPrefab;
-    [SerializeField] private string _battleScenePath = "Assets/00_Scenes/JoPockScene.unity";
+    [SerializeField] private string _battleScenePath = "Assets/00_Scenes/Play.unity";
     [SerializeField] private int _requiredPlayerCount = 2;
     [SerializeField] private float _matchFoundDelay = 1.5f; // "매칭 완료!" 문구를 보여줄 시간
 
