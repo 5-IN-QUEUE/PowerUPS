@@ -361,6 +361,7 @@ GameObject:
   - component: {fileID: 103867589}
   - component: {fileID: 103867588}
   - component: {fileID: 103867587}
+  - component: {fileID: 103867590}
   m_Layer: 0
   m_Name: GameFlowManager
   m_TagString: Untagged
@@ -386,6 +387,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 103867588}
+  - {fileID: 103867590}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &103867588
 MonoBehaviour:
@@ -415,6 +417,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &103867590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 103867586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 113c705b6683c4f608b7bd3fee7d84be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoundManager
 --- !u!1 &123213857
 GameObject:
   m_ObjectHideFlags: 0
