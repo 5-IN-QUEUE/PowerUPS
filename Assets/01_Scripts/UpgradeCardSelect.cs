@@ -25,54 +25,71 @@ public class UpgradeCardSelect : MonoBehaviour
         public TextLayout descLayout;
     }
 
+    public static bool IsSelecting { get; private set; } = false;
+
     private CardLayout[] slotLayouts = new CardLayout[4];
     private int currentIdx = 0;
     private int animatingCount = 0;
+    private bool _layoutsRecorded = false;
+    private bool _confirmed = false;
 
-    void Start()
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            var nameRect = upgradeCards[i].GetChild(0).GetComponent<RectTransform>();
-            var descRect = upgradeCards[i].GetChild(1).GetComponent<RectTransform>();
+    void Start() { }
 
-            slotLayouts[i] = new CardLayout
-            {
-                worldPos  = upgradeCards[i].position,
-                sizeDelta = upgradeCards[i].sizeDelta,
-
-                nameLayout = new TextLayout
-                {
-                    anchoredPos = nameRect.anchoredPosition,
-                    sizeDelta   = nameRect.sizeDelta,
-                    fontSize    = nameRect.GetComponent<TextMeshProUGUI>().fontSize
-                },
-                descLayout = new TextLayout
-                {
-                    anchoredPos = descRect.anchoredPosition,
-                    sizeDelta   = descRect.sizeDelta,
-                    fontSize    = descRect.GetComponent<TextMeshProUGUI>().fontSize
-                }
-            };
-        }
-
-        UpdateLayout(animated: false);
-    }
-
-    // UIManager가 SetActive(true)로 패널을 켤 때마다 호출됨
-    // 카드 선택을 처음 상태로 되돌림
+    // 비활성 오브젝트는 Start()가 호출되지 않으므로
+    // 최초 OnEnable()에서 카드 초기 위치를 기록하고 이후에는 상태만 리셋
     void OnEnable()
     {
-        if (slotLayouts == null || slotLayouts.Length == 0) return;
+        if (!_layoutsRecorded)
+        {
+            if (upgradeCards == null || upgradeCards.Length < 4) return;
+            for (int i = 0; i < 4; i++)
+            {
+                var nameRect = upgradeCards[i].GetChild(0).GetComponent<RectTransform>();
+                var descRect = upgradeCards[i].GetChild(1).GetComponent<RectTransform>();
+
+                slotLayouts[i] = new CardLayout
+                {
+                    worldPos  = upgradeCards[i].position,
+                    sizeDelta = upgradeCards[i].sizeDelta,
+
+                    nameLayout = new TextLayout
+                    {
+                        anchoredPos = nameRect.anchoredPosition,
+                        sizeDelta   = nameRect.sizeDelta,
+                        fontSize    = nameRect.GetComponent<TextMeshProUGUI>().fontSize
+                    },
+                    descLayout = new TextLayout
+                    {
+                        anchoredPos = descRect.anchoredPosition,
+                        sizeDelta   = descRect.sizeDelta,
+                        fontSize    = descRect.GetComponent<TextMeshProUGUI>().fontSize
+                    }
+                };
+            }
+            _layoutsRecorded = true;
+        }
+
+        IsSelecting = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible   = true;
+
+        _confirmed = false;
         currentIdx = 0;
         StopAllCoroutines();
         animatingCount = 0;
         UpdateLayout(animated: false);
     }
 
+    void OnDisable()
+    {
+        IsSelecting = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible   = false;
+    }
+
     void Update()
     {
-        if (animatingCount > 0) return;
+        if (animatingCount > 0 || _confirmed) return;
 
         if (Input.GetKeyDown(KeyCode.A))
         {
@@ -85,7 +102,6 @@ public class UpgradeCardSelect : MonoBehaviour
             UpdateLayout(animated: true);
         }
 
-        // 엔터 키로 카드 확정
         if (Input.GetKeyDown(KeyCode.Return))
         {
             ConfirmCard();
@@ -167,12 +183,19 @@ public class UpgradeCardSelect : MonoBehaviour
 
     public void ConfirmCard()
     {
+        if (_confirmed) return;
+        _confirmed = true;
+
         Debug.Log($"[UpgradeCardSelect] Card confirmed: {currentIdx}");
         OnCardConfirmed?.Invoke(currentIdx);
 
         if (PowerUpManager.Instance != null)
             PowerUpManager.Instance.OnCardConfirmed(currentIdx);
 
-        gameObject.SetActive(false);
+        // SetActive(false)를 여기서 호출하면 안 됨:
+        // 부모 패널(upgradeCardPanel)이 다음 라운드에 SetActive(true)될 때
+        // 자식인 이 오브젝트는 여전히 inactive 상태라 OnEnable이 호출되지 않아
+        // 2라운드부터 카드 선택이 완전히 죽음.
+        // 패널 숨김은 UIManager가 RoundActive 상태 진입 시 처리한다.
     }
 }

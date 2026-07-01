@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 966446}
   - component: {fileID: 966448}
   - component: {fileID: 966447}
+  - component: {fileID: 966449}
   m_Layer: 5
   m_Name: Quit
   m_TagString: Untagged
@@ -195,6 +196,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 966445}
   m_CullTransparentMesh: 1
+--- !u!114 &966449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 364fb9b73e4e79f4fa5278487aaeae21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPressEffect
+  pressedScale: 0.9
+  duration: 0.08
 --- !u!1 &49917857
 GameObject:
   m_ObjectHideFlags: 0
@@ -769,6 +784,7 @@ GameObject:
   - component: {fileID: 121221216}
   - component: {fileID: 121221215}
   - component: {fileID: 121221217}
+  - component: {fileID: 121221218}
   m_Layer: 5
   m_Name: MakeRoom
   m_TagString: Untagged
@@ -890,6 +906,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+--- !u!114 &121221218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121221213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 364fb9b73e4e79f4fa5278487aaeae21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPressEffect
+  pressedScale: 0.9
+  duration: 0.08
 --- !u!1 &276300801
 GameObject:
   m_ObjectHideFlags: 0
@@ -1009,6 +1039,7 @@ GameObject:
   - component: {fileID: 285419145}
   - component: {fileID: 285419144}
   - component: {fileID: 285419143}
+  - component: {fileID: 285419146}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -1130,6 +1161,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 285419141}
   m_CullTransparentMesh: 1
+--- !u!114 &285419146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 285419141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 364fb9b73e4e79f4fa5278487aaeae21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPressEffect
+  pressedScale: 0.9
+  duration: 0.08
 --- !u!1 &354605848
 GameObject:
   m_ObjectHideFlags: 0
@@ -1279,6 +1324,7 @@ GameObject:
   - component: {fileID: 355695854}
   - component: {fileID: 355695853}
   - component: {fileID: 355695855}
+  - component: {fileID: 355695856}
   m_Layer: 5
   m_Name: Start
   m_TagString: Untagged
@@ -1400,6 +1446,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+--- !u!114 &355695856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 355695851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 364fb9b73e4e79f4fa5278487aaeae21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPressEffect
+  pressedScale: 0.9
+  duration: 0.08
 --- !u!1 &399692732
 GameObject:
   m_ObjectHideFlags: 0
@@ -1565,6 +1625,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 416742382}
   m_CullTransparentMesh: 1
+--- !u!1 &445486445
+GameObject:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 445486447}
+  - component: {fileID: 445486446}
+  m_Layer: 0
+  m_Name: Fusion_PhotonBackgroundConnectionHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &445486446
+MonoBehaviour:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 445486445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1222927710, guid: 7de3b8b9e1263ad479e2d0c4261b7646, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Realtime.dll::Fusion.Photon.Realtime.ConnectionHandler
+  DisconnectAfterKeepAlive: 0
+  KeepAliveInBackground: 60000
+  ApplyDontDestroyOnLoad: 1
+--- !u!4 &445486447
+Transform:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 445486445}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &674398265
 GameObject:
   m_ObjectHideFlags: 0
@@ -2340,6 +2447,7 @@ GameObject:
   - component: {fileID: 1040499529}
   - component: {fileID: 1040499528}
   - component: {fileID: 1040499530}
+  - component: {fileID: 1040499531}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -2461,6 +2569,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1040499531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040499526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 364fb9b73e4e79f4fa5278487aaeae21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPressEffect
+  pressedScale: 0.9
+  duration: 0.08
 --- !u!1 &1114847833
 GameObject:
   m_ObjectHideFlags: 0
@@ -2919,6 +3041,7 @@ GameObject:
   - component: {fileID: 1471094927}
   - component: {fileID: 1471094929}
   - component: {fileID: 1471094928}
+  - component: {fileID: 1471094930}
   m_Layer: 5
   m_Name: Setting
   m_TagString: Untagged
@@ -2984,6 +3107,67 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1471094926}
   m_CullTransparentMesh: 1
+--- !u!114 &1471094930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1471094926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 364fb9b73e4e79f4fa5278487aaeae21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPressEffect
+  pressedScale: 0.9
+  duration: 0.08
+--- !u!1 &1496490956
+GameObject:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1496490958}
+  - component: {fileID: 1496490957}
+  m_Layer: 0
+  m_Name: Fusion_PhotonBackgroundConnectionHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1496490957
+MonoBehaviour:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1496490956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1222927710, guid: 7de3b8b9e1263ad479e2d0c4261b7646, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Realtime.dll::Fusion.Photon.Realtime.ConnectionHandler
+  DisconnectAfterKeepAlive: 0
+  KeepAliveInBackground: 60000
+  ApplyDontDestroyOnLoad: 1
+--- !u!4 &1496490958
+Transform:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1496490956}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1720168340
 GameObject:
   m_ObjectHideFlags: 0
@@ -2996,6 +3180,7 @@ GameObject:
   - component: {fileID: 1720168343}
   - component: {fileID: 1720168342}
   - component: {fileID: 1720168344}
+  - component: {fileID: 1720168345}
   m_Layer: 5
   m_Name: MakeRoomButton
   m_TagString: Untagged
@@ -3105,6 +3290,20 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1720168345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720168340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 364fb9b73e4e79f4fa5278487aaeae21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPressEffect
+  pressedScale: 0.9
+  duration: 0.08
 --- !u!1 &1742898641
 GameObject:
   m_ObjectHideFlags: 0
@@ -3676,6 +3875,61 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2038274553
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2038274555}
+  - component: {fileID: 2038274554}
+  m_Layer: 0
+  m_Name: SequentialButtonReveal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2038274554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038274553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f222b37b5746a9f45a5d9e87a7fc25f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SequentialButtonReveal
+  targets:
+  - {fileID: 355695852}
+  - {fileID: 1471094927}
+  - {fileID: 966446}
+  startDelay: 1
+  duration: 0.5
+  startScale: 3
+--- !u!224 &2038274555
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038274553}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 933.0006, y: 324.64734}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2071138868
 GameObject:
   m_ObjectHideFlags: 0
@@ -4036,5 +4290,8 @@ SceneRoots:
   - {fileID: 901462507}
   - {fileID: 674398267}
   - {fileID: 276300805}
+  - {fileID: 2038274555}
   - {fileID: 1986504873}
   - {fileID: 58041569}
+  - {fileID: 1496490958}
+  - {fileID: 445486447}

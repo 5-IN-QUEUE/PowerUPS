@@ -23,10 +23,11 @@ public class NetworkInputHandler : MonoBehaviour, INetworkRunnerCallbacks
     {
         var data = new NetworkInputData();
 
-        // ✅ 채팅창 열려있으면 이동/사격 입력 무시
-        if (ChattingScript.Instance != null && ChattingScript.Instance.IsChatOpen)
+        // 채팅창 또는 카드 선택 중이면 이동/사격 입력 무시
+        if ((ChattingScript.Instance != null && ChattingScript.Instance.IsChatOpen)
+            || UpgradeCardSelect.IsSelecting)
         {
-            input.Set(data);  // 빈 입력 전송
+            input.Set(data);
             return;
         }
 

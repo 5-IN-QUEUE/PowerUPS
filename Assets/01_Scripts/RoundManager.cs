@@ -12,13 +12,22 @@ public class RoundManager : NetworkBehaviour
     [Networked] private int SimultaneousDeathCount { get; set; }
     [Networked] private PlayerRef LastKiller { get; set; }
 
-    private static readonly Vector3[] SpawnPoints =
+    private static readonly Vector3[] FallbackSpawnPoints =
     {
-        new Vector3(-4f, 8f,  0f),
-        new Vector3( 4f, 8f,  0f),
-        new Vector3( 0f, 8f, -4f),
-        new Vector3( 0f, 8f,  4f),
+        new Vector3(-3f, 1f, 0f),
+        new Vector3( 3f, 1f, 0f),
+        new Vector3(-3f, 1f, 3f),
+        new Vector3( 3f, 1f, 3f),
     };
+
+    private Vector3 GetRespawnPosition(int index)
+    {
+        var point = GameObject.Find("SpawnPoint_" + index);
+        if (point != null) return point.transform.position;
+        return index < FallbackSpawnPoints.Length
+            ? FallbackSpawnPoints[index]
+            : new Vector3(index * 3f, 1f, 0f);
+    }
 
     public override void Spawned()
     {
@@ -88,11 +97,15 @@ public class RoundManager : NetworkBehaviour
 
         SimultaneousDeathCount = 0;
 
-        // GameFlowManager에 상태 전환 알림
-        var gfm = FindObjectOfType<GameFlowManager>();
+        // GameFlowManager에 상태 전환 알림 (비활성 포함 검색)
+        var gfm = FindObjectOfType<GameFlowManager>(true);
         if (gfm != null && gfm.HasStateAuthority)
         {
             gfm.EvaluateMatchStatus();
+        }
+        else if (gfm == null)
+        {
+            Debug.LogError("[RoundManager] GameFlowManager를 찾을 수 없습니다!");
         }
     }
 
@@ -105,11 +118,7 @@ public class RoundManager : NetworkBehaviour
             var ctrl = obj.GetComponent<PlayerController>();
             if (ctrl == null) { i++; continue; }
 
-            Vector3 pos = i < SpawnPoints.Length
-                ? SpawnPoints[i]
-                : new Vector3(i * 3f, 8f, 0f);
-
-            ctrl.Respawn(pos);
+            ctrl.Respawn(GetRespawnPosition(i));
             i++;
         }
     }
@@ -124,12 +133,7 @@ public class RoundManager : NetworkBehaviour
             if (ctrl == null) { i++; continue; }
 
             if (ctrl.PlayerHealth <= 0)
-            {
-                Vector3 pos = i < SpawnPoints.Length
-                    ? SpawnPoints[i]
-                    : new Vector3(i * 3f, 8f, 0f);
-                ctrl.Respawn(pos);
-            }
+                ctrl.Respawn(GetRespawnPosition(i));
 
             i++;
         }

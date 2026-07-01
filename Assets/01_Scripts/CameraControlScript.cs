@@ -54,9 +54,10 @@ public class CameraController : MonoBehaviour
 
     private void HandleMouseInput()
     {
-        // GetAxisRaw 사용 → Project Settings > Input에서 감도 조절 가능
+        if (UpgradeCardSelect.IsSelecting) return;
+
         Yaw   += Input.GetAxisRaw("Mouse X") * sensitivity;
-        Pitch -= Input.GetAxisRaw("Mouse Y") * sensitivity; // -: 마우스 위 = 위를 봄
+        Pitch -= Input.GetAxisRaw("Mouse Y") * sensitivity;
         Pitch  = Mathf.Clamp(Pitch, -pitchLimit, pitchLimit);
     }
 
