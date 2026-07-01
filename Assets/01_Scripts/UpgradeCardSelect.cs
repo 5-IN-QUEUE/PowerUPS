@@ -28,42 +28,44 @@ public class UpgradeCardSelect : MonoBehaviour
     private CardLayout[] slotLayouts = new CardLayout[4];
     private int currentIdx = 0;
     private int animatingCount = 0;
+    private bool _layoutsRecorded = false;
 
-    void Start()
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            var nameRect = upgradeCards[i].GetChild(0).GetComponent<RectTransform>();
-            var descRect = upgradeCards[i].GetChild(1).GetComponent<RectTransform>();
+    void Start() { }
 
-            slotLayouts[i] = new CardLayout
-            {
-                worldPos  = upgradeCards[i].position,
-                sizeDelta = upgradeCards[i].sizeDelta,
-
-                nameLayout = new TextLayout
-                {
-                    anchoredPos = nameRect.anchoredPosition,
-                    sizeDelta   = nameRect.sizeDelta,
-                    fontSize    = nameRect.GetComponent<TextMeshProUGUI>().fontSize
-                },
-                descLayout = new TextLayout
-                {
-                    anchoredPos = descRect.anchoredPosition,
-                    sizeDelta   = descRect.sizeDelta,
-                    fontSize    = descRect.GetComponent<TextMeshProUGUI>().fontSize
-                }
-            };
-        }
-
-        UpdateLayout(animated: false);
-    }
-
-    // UIManager가 SetActive(true)로 패널을 켤 때마다 호출됨
-    // 카드 선택을 처음 상태로 되돌림
+    // 비활성 오브젝트는 Start()가 호출되지 않으므로
+    // 최초 OnEnable()에서 카드 초기 위치를 기록하고 이후에는 상태만 리셋
     void OnEnable()
     {
-        if (slotLayouts == null || slotLayouts.Length == 0) return;
+        if (!_layoutsRecorded)
+        {
+            if (upgradeCards == null || upgradeCards.Length < 4) return;
+            for (int i = 0; i < 4; i++)
+            {
+                var nameRect = upgradeCards[i].GetChild(0).GetComponent<RectTransform>();
+                var descRect = upgradeCards[i].GetChild(1).GetComponent<RectTransform>();
+
+                slotLayouts[i] = new CardLayout
+                {
+                    worldPos  = upgradeCards[i].position,
+                    sizeDelta = upgradeCards[i].sizeDelta,
+
+                    nameLayout = new TextLayout
+                    {
+                        anchoredPos = nameRect.anchoredPosition,
+                        sizeDelta   = nameRect.sizeDelta,
+                        fontSize    = nameRect.GetComponent<TextMeshProUGUI>().fontSize
+                    },
+                    descLayout = new TextLayout
+                    {
+                        anchoredPos = descRect.anchoredPosition,
+                        sizeDelta   = descRect.sizeDelta,
+                        fontSize    = descRect.GetComponent<TextMeshProUGUI>().fontSize
+                    }
+                };
+            }
+            _layoutsRecorded = true;
+        }
+
         currentIdx = 0;
         StopAllCoroutines();
         animatingCount = 0;
