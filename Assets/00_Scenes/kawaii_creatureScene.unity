@@ -408,6 +408,7 @@ MonoBehaviour:
   _playerPrefab:
     RawGuidValue: 9e0c93958847b8b459caf5acf8aeb017
   _spawnPointNamePrefix: SpawnPoint_
+  _battleSceneName: Play
 --- !u!114 &58041567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -466,7 +467,7 @@ MonoBehaviour:
   roomNameInput: {fileID: 49917859}
   makeRoomButton: {fileID: 1720168344}
   cancelButton: {fileID: 0}
-  searchingPanel: {fileID: 0}
+  searchingPanel: {fileID: 1354546013}
   statusText: {fileID: 0}
 --- !u!1 &92394876
 GameObject:
