@@ -20,8 +20,15 @@ public class CameraController : MonoBehaviour
     {
         waitingUI.SetActive(true);
         Instance = this;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible   = false;
+        // 커서 잠금은 로컬 플레이어 초기화 후 Update()에서 처리한다.
+        // Awake에서 잠그면 로비로 돌아갈 때 커서가 복구되지 않는 문제가 생긴다.
+    }
+
+    private void OnDestroy()
+    {
+        // Play 씬이 언로드될 때(→ 로비) 커서를 반드시 복구한다.
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible   = true;
     }
 
     private void Update()
@@ -32,6 +39,11 @@ public class CameraController : MonoBehaviour
             if (PlayerController.localPlayer == null) return;
             InitCamera();
         }
+
+        // 카드 선택 중이면 커서 표시, 아니면 잠금 — 매 프레임 동기화
+        bool showCursor = UpgradeCardSelect.IsSelecting;
+        Cursor.visible   = showCursor;
+        Cursor.lockState = showCursor ? CursorLockMode.None : CursorLockMode.Locked;
 
         HandleMouseInput();
         ApplyPitchToCamera();

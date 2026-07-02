@@ -117,8 +117,8 @@ public class UpgradeCardSelect : MonoBehaviour
     private void EndSelecting()
     {
         IsSelecting = false;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible   = false;
+        // 커서 잠금은 CameraController.Update()가 IsSelecting을 보고 매 프레임 처리한다.
+        // 여기서 직접 잠그면 씬 언로드 시 OnDisable이 호출되어 로비에서도 커서가 사라진다.
     }
 
     void Update()
