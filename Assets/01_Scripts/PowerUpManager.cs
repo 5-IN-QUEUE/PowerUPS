@@ -15,6 +15,13 @@ public class PowerUpManager : NetworkBehaviour
     // PowerUp 카드 후보 (Inspector에서 4개 할당)
     [SerializeField] private PowerUpData[] powerUpCandidates = new PowerUpData[4];
 
+    // 슬롯(0/1)과 실제 PlayerRef의 매핑. Runner.ActivePlayers의 열거 순서는
+    // 호출마다 같다는 보장이 없으므로, 한 번 배정된 슬롯은 매치 내내 고정한다.
+    [Networked] private PlayerRef Player0Ref { get; set; }
+    [Networked] private PlayerRef Player1Ref { get; set; }
+    [Networked] private bool Player0RefAssigned { get; set; }
+    [Networked] private bool Player1RefAssigned { get; set; }
+
     // 각 플레이어의 선택 상태
     [Networked] private bool Player0Selected { get; set; }
     [Networked] private bool Player1Selected { get; set; }
@@ -36,31 +43,90 @@ public class PowerUpManager : NetworkBehaviour
         RPC_SubmitCardSelection(Runner.LocalPlayer, selectedIndex);
     }
 
+    /// <summary>
+    /// sender를 슬롯 0 또는 1에 고정 배정하고 슬롯 번호를 반환한다.
+    /// 이미 배정된 sender면 기존 슬롯을, 처음 보는 sender면 비어있는 슬롯을 배정한다.
+    /// </summary>
+    private int ResolveSlot(PlayerRef p)
+    {
+        if (Player0RefAssigned && Player0Ref == p) return 0;
+        if (Player1RefAssigned && Player1Ref == p) return 1;
+
+        if (!Player0RefAssigned)
+        {
+            Player0Ref = p;
+            Player0RefAssigned = true;
+            return 0;
+        }
+        if (!Player1RefAssigned)
+        {
+            Player1Ref = p;
+            Player1RefAssigned = true;
+            return 1;
+        }
+
+        return -1; // 두 슬롯이 이미 다른 플레이어로 채워진 상태 (정상 2인 대전에서는 발생하지 않음)
+    }
+
+    /// <summary>
+    /// 이번 라운드에 두 플레이어 모두 카드를 선택해야 하는지 여부.
+    /// 아직 아무도 죽지 않은 첫 라운드, 혹은 동시 사망이었던 라운드에는 둘 다 선택한다.
+    /// 그 외에는 라운드에서 진(죽은) 플레이어만 선택한다.
+    /// </summary>
+    private bool BothMustSelect()
+    {
+        return RoundManager.Instance == null || RoundManager.Instance.LastVictim == PlayerRef.None;
+    }
+
+    private bool IsEligible(PlayerRef p)
+    {
+        return BothMustSelect() || p == RoundManager.Instance.LastVictim;
+    }
+
+    private bool SelectionsComplete()
+    {
+        if (BothMustSelect())
+            return Player0Selected && Player1Selected;
+
+        PlayerRef victim = RoundManager.Instance.LastVictim;
+        if (Player0RefAssigned && Player0Ref == victim) return Player0Selected;
+        if (Player1RefAssigned && Player1Ref == victim) return Player1Selected;
+        return false;
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     private void RPC_SubmitCardSelection(PlayerRef sender, int selectedIndex)
     {
         if (!HasStateAuthority) return;
 
-        List<PlayerRef> activePlayers = new List<PlayerRef>(Runner.ActivePlayers);
-        if (activePlayers.Count < 2) return;
+        if (!IsEligible(sender))
+        {
+            Debug.LogWarning($"[PowerUpManager] {sender}는 이번 라운드의 승자라 카드를 선택할 수 없습니다. 선택을 무시합니다.");
+            return;
+        }
 
-        if (activePlayers[0] == sender)
+        int slot = ResolveSlot(sender);
+        if (slot == 0)
         {
             Player0Selected = true;
             Player0SelectedIndex = selectedIndex;
-            Debug.Log($"[PowerUpManager] Player 0 selected: {selectedIndex}");
+            Debug.Log($"[PowerUpManager] Player0({sender}) selected: {selectedIndex}");
         }
-        else if (activePlayers[1] == sender)
+        else if (slot == 1)
         {
             Player1Selected = true;
             Player1SelectedIndex = selectedIndex;
-            Debug.Log($"[PowerUpManager] Player 1 selected: {selectedIndex}");
+            Debug.Log($"[PowerUpManager] Player1({sender}) selected: {selectedIndex}");
+        }
+        else
+        {
+            Debug.LogWarning($"[PowerUpManager] {sender}에 배정할 슬롯이 없습니다. 선택을 무시합니다.");
+            return;
         }
 
-        // 양 플레이어가 모두 선택 완료 시
-        if (Player0Selected && Player1Selected)
+        if (SelectionsComplete())
         {
-            ApplyPowerUps(activePlayers[0], activePlayers[1]);
+            ApplyPowerUps(Player0Ref, Player1Ref);
             ResetSelections();
         }
     }
@@ -75,21 +141,25 @@ public class PowerUpManager : NetworkBehaviour
         List<PlayerRef> activePlayers = new List<PlayerRef>(Runner.ActivePlayers);
         if (activePlayers.Count < 2) return;
 
-        if (!Player0Selected)
+        // 지금까지 한 번도 선택을 보내지 않은 플레이어도 슬롯에 배정해둔다.
+        foreach (var p in activePlayers)
+            ResolveSlot(p);
+
+        if (!Player0Selected && IsEligible(Player0Ref))
         {
             Player0SelectedIndex = Random.Range(0, powerUpCandidates.Length);
             Player0Selected = true;
-            Debug.Log($"[PowerUpManager] Player 0 auto-selected: {Player0SelectedIndex}");
+            Debug.Log($"[PowerUpManager] Player0({Player0Ref}) auto-selected: {Player0SelectedIndex}");
         }
 
-        if (!Player1Selected)
+        if (!Player1Selected && IsEligible(Player1Ref))
         {
             Player1SelectedIndex = Random.Range(0, powerUpCandidates.Length);
             Player1Selected = true;
-            Debug.Log($"[PowerUpManager] Player 1 auto-selected: {Player1SelectedIndex}");
+            Debug.Log($"[PowerUpManager] Player1({Player1Ref}) auto-selected: {Player1SelectedIndex}");
         }
 
-        ApplyPowerUps(activePlayers[0], activePlayers[1]);
+        ApplyPowerUps(Player0Ref, Player1Ref);
         ResetSelections();
     }
 
@@ -100,7 +170,7 @@ public class PowerUpManager : NetworkBehaviour
         {
             var ctrl0 = obj0.GetComponent<PlayerController>();
             var powerUp0 = powerUpCandidates[Player0SelectedIndex];
-            
+
             if (ctrl0 != null && powerUp0 != null)
             {
                 powerUp0.Apply(ctrl0);
@@ -113,7 +183,7 @@ public class PowerUpManager : NetworkBehaviour
         {
             var ctrl1 = obj1.GetComponent<PlayerController>();
             var powerUp1 = powerUpCandidates[Player1SelectedIndex];
-            
+
             if (ctrl1 != null && powerUp1 != null)
             {
                 powerUp1.Apply(ctrl1);
@@ -126,6 +196,10 @@ public class PowerUpManager : NetworkBehaviour
         if (gfm != null)
         {
             gfm.OnAugmentSelectComplete();
+        }
+        else
+        {
+            Debug.LogWarning("[PowerUpManager] GameFlowManager를 찾지 못해 RoundActive로 전환하지 못했습니다.");
         }
     }
 

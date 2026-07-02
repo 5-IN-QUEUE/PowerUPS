@@ -108,7 +108,7 @@ public class PlayerController : NetworkBehaviour
 
         if (PlayerHealth <= 0)
         {
-            if (RoundManager.Instance != null) RoundManager.Instance.RegisterKill(killer);
+            if (RoundManager.Instance != null) RoundManager.Instance.RegisterKill(killer, Object.InputAuthority);
             RPC_OnDeath();
         }
     }
