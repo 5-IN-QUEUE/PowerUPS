@@ -78,7 +78,9 @@ public class PlayerShoot : NetworkBehaviour
     {
         foreach (var change in _changes.DetectChanges(this))
         {
-            if (change == nameof(IsReloading) && IsReloading)
+            // OnReloadStart는 static 이벤트라 HasInputAuthority 체크 없이 발동하면
+            // 상대 플레이어의 IsReloading 변경도 내 로컬 리로드 애니메이션을 트리거해버린다.
+            if (change == nameof(IsReloading) && IsReloading && HasInputAuthority)
                 OnReloadStart?.Invoke();
         }
     }

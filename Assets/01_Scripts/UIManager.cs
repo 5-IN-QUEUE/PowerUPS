@@ -132,12 +132,20 @@ public class UIManager : MonoBehaviour
                 if (roundEndPanel != null) roundEndPanel.SetActive(false);
                 if (upgradeCardPanel != null)
                 {
-                    upgradeCardPanel.SetActive(true);
-                    // Networked 상태 스냅샷이 RPC보다 늦게 도착하면
-                    // UpgradeCardSelect.OnEnable()의 CurrentState 체크가 실패할 수 있어
-                    // BeginSelecting()이 안 불릴 수 있다. 여기서 직접 호출해 타이밍 의존 제거.
-                    var ucs = upgradeCardPanel.GetComponentInChildren<UpgradeCardSelect>(true);
-                    if (ucs != null) ucs.BeginSelecting();
+                    // 패자만 카드를 선택해야 하는 라운드에 승자 쪽에도 카드 화면이
+                    // 뜨면, 승자가 카드를 눌러도 서버에서 조용히 무시될 뿐인데
+                    // 겉보기엔 "승자도 증강을 고른 것처럼" 보이는 문제가 있었다.
+                    // 자격 없는 클라이언트는 패널 자체를 띄우지 않는다.
+                    bool eligible = IsLocalPlayerEligibleForAugment();
+                    upgradeCardPanel.SetActive(eligible);
+                    if (eligible)
+                    {
+                        // Networked 상태 스냅샷이 RPC보다 늦게 도착하면
+                        // UpgradeCardSelect.OnEnable()의 CurrentState 체크가 실패할 수 있어
+                        // BeginSelecting()이 안 불릴 수 있다. 여기서 직접 호출해 타이밍 의존 제거.
+                        var ucs = upgradeCardPanel.GetComponentInChildren<UpgradeCardSelect>(true);
+                        if (ucs != null) ucs.BeginSelecting();
+                    }
                 }
                 break;
 
@@ -184,6 +192,17 @@ public class UIManager : MonoBehaviour
                     matchFinalScoreText.SetText($"{localCtrl.Score} - {opponentScore}");
             }
         }
+    }
+
+    private bool IsLocalPlayerEligibleForAugment()
+    {
+        if (RoundManager.Instance == null) return true;
+        if (PlayerController.localPlayer == null) return true;
+
+        var pc = PlayerController.localPlayer.GetComponent<PlayerController>();
+        if (pc == null || pc.Runner == null) return true;
+
+        return RoundManager.Instance.IsEligibleThisRound(pc.Runner.LocalPlayer);
     }
 
     private void ShowPowerUpApplication(Fusion.PlayerRef player, string powerUpName, string description)

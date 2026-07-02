@@ -135,11 +135,13 @@ public class PlayerController : NetworkBehaviour
     public void IncreaseMaxHealth(int amount)
     {
         if (!HasStateAuthority) return;
-        
+
         MaxHealthPoints += amount;
-        if (PlayerHealth > MaxHealthPoints)
-            PlayerHealth = MaxHealthPoints;
-        
+        // 최대체력이 늘어난 만큼 현재 체력도 즉시 채워준다.
+        // 캡(내려깎기)만 하면 카드 선택 직후 체력이 그대로라 "증강이 적용 안 됐다"는
+        // 오해를 만든다. 다음 리스폰까지 기다려야 체감되는 문제를 방지.
+        PlayerHealth = Mathf.Min(PlayerHealth + amount, MaxHealthPoints);
+
         Debug.Log($"[PowerUp] Max health increased to {MaxHealthPoints}");
     }
     public void IncreasePellets(int amount){

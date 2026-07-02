@@ -69,16 +69,30 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             }
         }
 
-        // GameFlowManager에 씬 로드 완료 신호 전송 (비활성 포함 검색)
-        var gfm = FindObjectOfType<GameFlowManager>(true);
+        // GameFlowManager에 씬 로드 완료 신호 전송.
+        // FindObjectOfType은 Fusion이 이 오브젝트에 Spawned()를 아직 호출하지
+        // 않은 상태에서도 GameObject를 찾아버릴 수 있어서, 그 시점에 CurrentState
+        // 같은 [Networked] 프로퍼티를 읽으면 InvalidOperationException이 터진다.
+        // GameFlowManager.Instance는 Spawned() 안에서만 대입되므로 이 시점엔
+        // 네트워크 상태 버퍼가 이미 준비돼 있다는 게 보장된다. 씬 로드 직후
+        // 아직 Instance가 안 잡혔을 수도 있어 몇 프레임 정도는 재시도한다.
+        GameFlowManager gfm = GameFlowManager.Instance;
+        int retries = 0;
+        while (gfm == null && retries < 60)
+        {
+            yield return null;
+            gfm = GameFlowManager.Instance;
+            retries++;
+        }
+
         if (gfm == null)
         {
-            Debug.LogError("[PlayerSpawner] GameFlowManager를 씬에서 찾을 수 없습니다! " +
+            Debug.LogError("[PlayerSpawner] GameFlowManager.Instance를 찾을 수 없습니다! " +
                            "Play 씬에 NetworkObject + GameFlowManager가 붙은 오브젝트를 추가해주세요.");
             yield break;
         }
 
-        Debug.Log($"[PlayerSpawner] GameFlowManager 발견. HasStateAuthority={gfm.HasStateAuthority}, State={gfm.CurrentState}");
+        Debug.Log($"[PlayerSpawner] GameFlowManager 발견. HasStateAuthority={gfm.HasStateAuthority}");
 
         if (gfm.HasStateAuthority)
             gfm.OnSceneLoadComplete();

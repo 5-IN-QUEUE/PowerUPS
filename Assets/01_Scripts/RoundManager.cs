@@ -42,14 +42,22 @@ public class RoundManager : NetworkBehaviour
     // StateAuthority(서버)에서만 호출됨
     public void RegisterKill(PlayerRef killer, PlayerRef victim)
     {
-        if (!HasStateAuthority || IsRoundEnding) return;
+        if (!HasStateAuthority) return;
 
-        // 동시 사망 감지
-        if (SimultaneousDeathCount > 0)
+        // 이미 라운드 종료 처리 중(누군가 먼저 죽어서 타이머가 도는 중)인데
+        // 또 다른 플레이어의 사망이 들어오면 동시 사망으로 처리한다.
+        // 예전 코드는 위쪽에서 IsRoundEnding이면 무조건 return 해버려서
+        // 이 분기가 절대 실행되지 않는 죽은 코드였다 — 그래서 맞대결로 동시에
+        // 죽어도 항상 먼저 처리된 한쪽만 "패자"로 기록되고, 두 번째로 죽은
+        // 플레이어는 다음 라운드 증강 선택에서 제외되던 버그의 원인이었다.
+        if (IsRoundEnding)
         {
-            SimultaneousDeathCount++;
-            LastVictim = PlayerRef.None; // 특정할 수 없는 패자 → 다음 카드 선택은 둘 다 진행
-            Debug.Log($"[RoundManager] Simultaneous death detected. Count: {SimultaneousDeathCount}");
+            if (victim != LastVictim)
+            {
+                LastVictim = PlayerRef.None; // 특정할 수 없는 패자 → 다음 카드 선택은 둘 다 진행
+                SimultaneousDeathCount++;
+                Debug.Log($"[RoundManager] Simultaneous death detected. Count: {SimultaneousDeathCount}");
+            }
             return;
         }
 
@@ -80,7 +88,32 @@ public class RoundManager : NetworkBehaviour
         LastVictim = victim;
         SimultaneousDeathCount = 1;
 
+        // 라운드 종료 순간 날아다니던 총알(같은 산탄에서 나온 나머지 펠릿 등)이
+        // 리스폰 대기 중인 플레이어에게 뒤늦게 명중해 체력을 깎거나, 죽은 걸로
+        // 잘못 재판정되는 걸 막는다. (리스폰 직후 체력이 max로 안 돌아오는
+        // 것처럼 보이던 문제의 원인 중 하나)
+        DespawnAllBullets();
+
         RPC_RoundEnd(killerName, sb.ToString());
+    }
+
+    private void DespawnAllBullets()
+    {
+        foreach (var bullet in FindObjectsOfType<BulletScript>())
+        {
+            if (bullet.Object != null && bullet.Object.IsValid)
+                Runner.Despawn(bullet.Object);
+        }
+    }
+
+    /// <summary>
+    /// 이번 라운드에 해당 플레이어가 증강 카드를 선택할 자격이 있는지.
+    /// LastVictim이 Networked public이라 모든 클라이언트가 직접 읽을 수 있어
+    /// UI 쪽(승자에게는 카드 화면을 아예 띄우지 않는 용도)에서 사용한다.
+    /// </summary>
+    public bool IsEligibleThisRound(PlayerRef p)
+    {
+        return LastVictim == PlayerRef.None || p == LastVictim;
     }
 
     public override void FixedUpdateNetwork()
@@ -96,8 +129,8 @@ public class RoundManager : NetworkBehaviour
 
         SimultaneousDeathCount = 0;
 
-        // GameFlowManager에 상태 전환 알림 (비활성 포함 검색)
-        var gfm = FindObjectOfType<GameFlowManager>(true);
+        // GameFlowManager에 상태 전환 알림
+        var gfm = GameFlowManager.Instance;
         if (gfm != null && gfm.HasStateAuthority)
         {
             gfm.EvaluateMatchStatus();

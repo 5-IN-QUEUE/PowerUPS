@@ -198,7 +198,7 @@ public class PowerUpManager : NetworkBehaviour
         }
 
         // 양쪽 모두 선택 완료 → GameFlowManager 상태 전환
-        GameFlowManager gfm = FindObjectOfType<GameFlowManager>();
+        GameFlowManager gfm = GameFlowManager.Instance;
         if (gfm != null)
         {
             gfm.OnAugmentSelectComplete();
