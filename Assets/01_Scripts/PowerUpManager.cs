@@ -169,9 +169,12 @@ public class PowerUpManager : NetworkBehaviour
         if (Runner.TryGetPlayerObject(player0, out var obj0) && Player0SelectedIndex >= 0)
         {
             var ctrl0 = obj0.GetComponent<PlayerController>();
-            var powerUp0 = powerUpCandidates[Player0SelectedIndex];
+            var powerUp0 = (Player0SelectedIndex < powerUpCandidates.Length)
+                ? powerUpCandidates[Player0SelectedIndex] : null;
 
-            if (ctrl0 != null && powerUp0 != null)
+            if (powerUp0 == null)
+                Debug.LogError($"[PowerUpManager] powerUpCandidates[{Player0SelectedIndex}]가 null! Inspector에서 PowerUpData 4개를 연결해주세요.");
+            else if (ctrl0 != null)
             {
                 powerUp0.Apply(ctrl0);
                 RPC_NotifyPowerUpApplied(player0, powerUp0.powerUpName, powerUp0.description);
@@ -182,9 +185,12 @@ public class PowerUpManager : NetworkBehaviour
         if (Runner.TryGetPlayerObject(player1, out var obj1) && Player1SelectedIndex >= 0)
         {
             var ctrl1 = obj1.GetComponent<PlayerController>();
-            var powerUp1 = powerUpCandidates[Player1SelectedIndex];
+            var powerUp1 = (Player1SelectedIndex < powerUpCandidates.Length)
+                ? powerUpCandidates[Player1SelectedIndex] : null;
 
-            if (ctrl1 != null && powerUp1 != null)
+            if (powerUp1 == null)
+                Debug.LogError($"[PowerUpManager] powerUpCandidates[{Player1SelectedIndex}]가 null! Inspector에서 PowerUpData 4개를 연결해주세요.");
+            else if (ctrl1 != null)
             {
                 powerUp1.Apply(ctrl1);
                 RPC_NotifyPowerUpApplied(player1, powerUp1.powerUpName, powerUp1.description);

@@ -130,7 +130,15 @@ public class UIManager : MonoBehaviour
             case GameFlowManager.GameState.AugmentSelect:
                 if (loadingPanel != null) loadingPanel.SetActive(false);
                 if (roundEndPanel != null) roundEndPanel.SetActive(false);
-                if (upgradeCardPanel != null) upgradeCardPanel.SetActive(true);
+                if (upgradeCardPanel != null)
+                {
+                    upgradeCardPanel.SetActive(true);
+                    // Networked 상태 스냅샷이 RPC보다 늦게 도착하면
+                    // UpgradeCardSelect.OnEnable()의 CurrentState 체크가 실패할 수 있어
+                    // BeginSelecting()이 안 불릴 수 있다. 여기서 직접 호출해 타이밍 의존 제거.
+                    var ucs = upgradeCardPanel.GetComponentInChildren<UpgradeCardSelect>(true);
+                    if (ucs != null) ucs.BeginSelecting();
+                }
                 break;
 
             case GameFlowManager.GameState.RoundActive:

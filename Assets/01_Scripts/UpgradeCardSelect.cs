@@ -99,7 +99,7 @@ public class UpgradeCardSelect : MonoBehaviour
         _layoutsRecorded = true;
     }
 
-    private void BeginSelecting()
+    public void BeginSelecting()
     {
         RecordLayoutsIfNeeded();
 

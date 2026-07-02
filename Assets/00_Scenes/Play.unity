@@ -634,9 +634,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PowerUpManager
   powerUpCandidates:
+  - {fileID: 11400000, guid: 28331365a0c844be4b419d35964809d1, type: 2}
   - {fileID: 11400000, guid: b8bee866fd5aa487aa46a059df5dd5d3, type: 2}
   - {fileID: 11400000, guid: 343b6d29ee8b641b7813f686e9252009, type: 2}
-  - {fileID: 11400000, guid: 28331365a0c844be4b419d35964809d1, type: 2}
   - {fileID: 11400000, guid: 8c6d4bbb2d5974bfebb8faae7400cc01, type: 2}
 --- !u!4 &139659020
 Transform:
