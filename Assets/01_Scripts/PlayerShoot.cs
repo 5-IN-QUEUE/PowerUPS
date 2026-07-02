@@ -83,20 +83,16 @@ public class PlayerShoot : NetworkBehaviour
         }
     }
 
-    // 라운드 재시작 시 서버에서 호출
+    // 라운드 재시작 시 서버에서 호출. 탄약/재장전 상태만 초기화하고
+    // 파워업으로 얻은 데미지/발사속도/펠릿/튕김/명중률/탄속 보너스는
+    // 라운드가 넘어가도 유지되어야 하므로 여기서 건드리지 않는다.
     public void ResetGun()
     {
         if (!HasStateAuthority) return;
-        Ammo                  = GunData.MaxAmmo;
-        IsReloading           = false;
-        ReloadTimer           = default;
-        FireTimer             = default;
-        DamageMultiplier      = 1f;
-        FireRateMultiplier    = 1f;
-        PelletBonus           = 0;
-        BounceBonus           = 0;
-        AccuracyBonus         = 0f;
-        BulletSpeedMultiplier = 1f;
+        Ammo        = GunData.MaxAmmo;
+        IsReloading = false;
+        ReloadTimer = default;
+        FireTimer   = default;
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]

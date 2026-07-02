@@ -12,6 +12,11 @@ public class RoundManager : NetworkBehaviour
     [Networked] private int SimultaneousDeathCount { get; set; }
     [Networked] private PlayerRef LastKiller { get; set; }
 
+    // 이번 라운드에서 죽은(진) 플레이어. PowerUpManager가 "패자만 카드 선택" 판단에 사용한다.
+    // 동시 사망이거나 아직 아무도 죽지 않은 첫 라운드에는 PlayerRef.None으로 둬서
+    // "둘 다 선택" 케이스임을 나타낸다.
+    [Networked] public PlayerRef LastVictim { get; private set; }
+
     private static readonly Vector3[] FallbackSpawnPoints =
     {
         new Vector3(-3f, 1f, 0f),
@@ -35,7 +40,7 @@ public class RoundManager : NetworkBehaviour
     }
 
     // StateAuthority(서버)에서만 호출됨
-    public void RegisterKill(PlayerRef killer)
+    public void RegisterKill(PlayerRef killer, PlayerRef victim)
     {
         if (!HasStateAuthority || IsRoundEnding) return;
 
@@ -43,6 +48,7 @@ public class RoundManager : NetworkBehaviour
         if (SimultaneousDeathCount > 0)
         {
             SimultaneousDeathCount++;
+            LastVictim = PlayerRef.None; // 특정할 수 없는 패자 → 다음 카드 선택은 둘 다 진행
             Debug.Log($"[RoundManager] Simultaneous death detected. Count: {SimultaneousDeathCount}");
             return;
         }
@@ -71,6 +77,7 @@ public class RoundManager : NetworkBehaviour
         IsRoundEnding = true;
         RestartTimer  = TickTimer.CreateFromSeconds(Runner, 3f);
         LastKiller = killer;
+        LastVictim = victim;
         SimultaneousDeathCount = 1;
 
         RPC_RoundEnd(killerName, sb.ToString());
@@ -83,17 +90,9 @@ public class RoundManager : NetworkBehaviour
 
         IsRoundEnding = false;
 
-        // 동시 사망 여부에 따라 처리
-        if (SimultaneousDeathCount > 1)
-        {
-            Debug.Log("[RoundManager] Simultaneous death → Both players respawn");
-            RespawnBothPlayers();
-        }
-        else
-        {
-            Debug.Log($"[RoundManager] Regular kill by {LastKiller}");
-            RespawnDeadPlayers();
-        }
+        // 승패와 상관없이 라운드가 끝나면 두 플레이어 모두 스폰 위치로 복귀,
+        // 체력/탄약을 초기화한다 (파워업으로 얻은 스탯은 유지됨).
+        RespawnBothPlayers();
 
         SimultaneousDeathCount = 0;
 
@@ -119,22 +118,6 @@ public class RoundManager : NetworkBehaviour
             if (ctrl == null) { i++; continue; }
 
             ctrl.Respawn(GetRespawnPosition(i));
-            i++;
-        }
-    }
-
-    private void RespawnDeadPlayers()
-    {
-        int i = 0;
-        foreach (var p in Runner.ActivePlayers)
-        {
-            if (!Runner.TryGetPlayerObject(p, out var obj)) { i++; continue; }
-            var ctrl = obj.GetComponent<PlayerController>();
-            if (ctrl == null) { i++; continue; }
-
-            if (ctrl.PlayerHealth <= 0)
-                ctrl.Respawn(GetRespawnPosition(i));
-
             i++;
         }
     }

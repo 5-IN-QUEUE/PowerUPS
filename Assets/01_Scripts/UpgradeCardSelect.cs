@@ -33,41 +33,75 @@ public class UpgradeCardSelect : MonoBehaviour
     private bool _layoutsRecorded = false;
     private bool _confirmed = false;
 
-    void Start() { }
+    void Awake()
+    {
+        RecordLayoutsIfNeeded();
+    }
 
-    // 비활성 오브젝트는 Start()가 호출되지 않으므로
-    // 최초 OnEnable()에서 카드 초기 위치를 기록하고 이후에는 상태만 리셋
+    // 이 컴포넌트가 붙은 오브젝트가 씬에서 UIManager가 켜고 끄는 카드 패널의
+    // 자식이 아니라 별도로 배치되어 있을 수 있으므로(항상 활성 상태),
+    // 카드 선택 on/off는 오브젝트의 OnEnable/OnDisable이 아니라
+    // GameFlowManager의 상태 변화 이벤트로 직접 제어한다.
     void OnEnable()
     {
-        if (!_layoutsRecorded)
+        GameFlowManager.OnStateChanged += HandleGameStateChanged;
+
+        if (GameFlowManager.Instance != null &&
+            GameFlowManager.Instance.CurrentState == GameFlowManager.GameState.AugmentSelect)
         {
-            if (upgradeCards == null || upgradeCards.Length < 4) return;
-            for (int i = 0; i < 4; i++)
-            {
-                var nameRect = upgradeCards[i].GetChild(0).GetComponent<RectTransform>();
-                var descRect = upgradeCards[i].GetChild(1).GetComponent<RectTransform>();
-
-                slotLayouts[i] = new CardLayout
-                {
-                    worldPos  = upgradeCards[i].position,
-                    sizeDelta = upgradeCards[i].sizeDelta,
-
-                    nameLayout = new TextLayout
-                    {
-                        anchoredPos = nameRect.anchoredPosition,
-                        sizeDelta   = nameRect.sizeDelta,
-                        fontSize    = nameRect.GetComponent<TextMeshProUGUI>().fontSize
-                    },
-                    descLayout = new TextLayout
-                    {
-                        anchoredPos = descRect.anchoredPosition,
-                        sizeDelta   = descRect.sizeDelta,
-                        fontSize    = descRect.GetComponent<TextMeshProUGUI>().fontSize
-                    }
-                };
-            }
-            _layoutsRecorded = true;
+            BeginSelecting();
         }
+    }
+
+    void OnDisable()
+    {
+        GameFlowManager.OnStateChanged -= HandleGameStateChanged;
+        EndSelecting();
+    }
+
+    private void HandleGameStateChanged(GameFlowManager.GameState state)
+    {
+        if (state == GameFlowManager.GameState.AugmentSelect)
+            BeginSelecting();
+        else
+            EndSelecting();
+    }
+
+    private void RecordLayoutsIfNeeded()
+    {
+        if (_layoutsRecorded) return;
+        if (upgradeCards == null || upgradeCards.Length < 4) return;
+
+        for (int i = 0; i < 4; i++)
+        {
+            var nameRect = upgradeCards[i].GetChild(0).GetComponent<RectTransform>();
+            var descRect = upgradeCards[i].GetChild(1).GetComponent<RectTransform>();
+
+            slotLayouts[i] = new CardLayout
+            {
+                worldPos  = upgradeCards[i].position,
+                sizeDelta = upgradeCards[i].sizeDelta,
+
+                nameLayout = new TextLayout
+                {
+                    anchoredPos = nameRect.anchoredPosition,
+                    sizeDelta   = nameRect.sizeDelta,
+                    fontSize    = nameRect.GetComponent<TextMeshProUGUI>().fontSize
+                },
+                descLayout = new TextLayout
+                {
+                    anchoredPos = descRect.anchoredPosition,
+                    sizeDelta   = descRect.sizeDelta,
+                    fontSize    = descRect.GetComponent<TextMeshProUGUI>().fontSize
+                }
+            };
+        }
+        _layoutsRecorded = true;
+    }
+
+    private void BeginSelecting()
+    {
+        RecordLayoutsIfNeeded();
 
         IsSelecting = true;
         Cursor.lockState = CursorLockMode.None;
@@ -80,7 +114,7 @@ public class UpgradeCardSelect : MonoBehaviour
         UpdateLayout(animated: false);
     }
 
-    void OnDisable()
+    private void EndSelecting()
     {
         IsSelecting = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -89,6 +123,7 @@ public class UpgradeCardSelect : MonoBehaviour
 
     void Update()
     {
+        if (!IsSelecting) return;
         if (animatingCount > 0 || _confirmed) return;
 
         if (Input.GetKeyDown(KeyCode.A))
@@ -184,18 +219,26 @@ public class UpgradeCardSelect : MonoBehaviour
     public void ConfirmCard()
     {
         if (_confirmed) return;
+
+        if (PowerUpManager.Instance == null)
+        {
+            // 아직 PowerUpManager가 스폰되지 않은 상태 — _confirmed를 세우지 않고
+            // 다음 Enter 입력에서 다시 시도할 수 있게 둔다. 여기서 true로 확정해버리면
+            // 이 클라이언트는 선택을 서버에 영영 전송하지 못한 채 잠겨서
+            // 상대방도 함께 다음 라운드로 못 넘어가는 소프트락이 발생한다.
+            Debug.LogWarning("[UpgradeCardSelect] PowerUpManager.Instance가 아직 없어 선택 전송을 보류합니다.");
+            return;
+        }
+
         _confirmed = true;
 
         Debug.Log($"[UpgradeCardSelect] Card confirmed: {currentIdx}");
         OnCardConfirmed?.Invoke(currentIdx);
+        PowerUpManager.Instance.OnCardConfirmed(currentIdx);
 
-        if (PowerUpManager.Instance != null)
-            PowerUpManager.Instance.OnCardConfirmed(currentIdx);
-
-        // SetActive(false)를 여기서 호출하면 안 됨:
-        // 부모 패널(upgradeCardPanel)이 다음 라운드에 SetActive(true)될 때
-        // 자식인 이 오브젝트는 여전히 inactive 상태라 OnEnable이 호출되지 않아
-        // 2라운드부터 카드 선택이 완전히 죽음.
-        // 패널 숨김은 UIManager가 RoundActive 상태 진입 시 처리한다.
+        // EndSelecting()을 여기서 직접 부르지 않는다: 실제 선택 종료는
+        // GameFlowManager가 RoundActive로 전환되며 보내는 OnStateChanged 이벤트로 처리된다
+        // (두 플레이어가 모두 선택을 마쳐야 서버가 상태를 전환하기 때문).
+        // 카드 UI 패널 표시/숨김은 UIManager가 별도로 처리한다.
     }
 }
