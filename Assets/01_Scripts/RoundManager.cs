@@ -11,6 +11,7 @@ public class RoundManager : NetworkBehaviour
     [Networked] private bool      IsRoundEnding { get; set; }
     [Networked] private int SimultaneousDeathCount { get; set; }
     [Networked] private PlayerRef LastKiller { get; set; }
+    [Networked] private bool PendingBulletCleanup { get; set; }
 
     // 이번 라운드에서 죽은(진) 플레이어. PowerUpManager가 "패자만 카드 선택" 판단에 사용한다.
     // 동시 사망이거나 아직 아무도 죽지 않은 첫 라운드에는 PlayerRef.None으로 둬서
@@ -92,7 +93,14 @@ public class RoundManager : NetworkBehaviour
         // 리스폰 대기 중인 플레이어에게 뒤늦게 명중해 체력을 깎거나, 죽은 걸로
         // 잘못 재판정되는 걸 막는다. (리스폰 직후 체력이 max로 안 돌아오는
         // 것처럼 보이던 문제의 원인 중 하나)
-        DespawnAllBullets();
+        //
+        // 여기서 바로 DespawnAllBullets()를 호출하면 안 된다: RegisterKill은
+        // "명중한 그 총알"의 BulletScript.FixedUpdateNetwork() 안에서 호출되는데,
+        // 그 총알 자신까지 여기서 despawn시켜버리면 원래 코드가 되돌아가서
+        // Shooter 프로퍼티를 다시 읽으려 할 때 이미 파괴된 네트워크 오브젝트라
+        // InvalidOperationException이 터진다. 플래그만 세워 다음 틱(RoundManager
+        // 자신의 FixedUpdateNetwork)에서 정리해 재진입 문제를 피한다.
+        PendingBulletCleanup = true;
 
         RPC_RoundEnd(killerName, sb.ToString());
     }
@@ -118,7 +126,15 @@ public class RoundManager : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (!HasStateAuthority || !IsRoundEnding) return;
+        if (!HasStateAuthority) return;
+
+        if (PendingBulletCleanup)
+        {
+            PendingBulletCleanup = false;
+            DespawnAllBullets();
+        }
+
+        if (!IsRoundEnding) return;
         if (!RestartTimer.Expired(Runner)) return;
 
         IsRoundEnding = false;

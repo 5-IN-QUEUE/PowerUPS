@@ -23,9 +23,19 @@ public class NetworkInputHandler : MonoBehaviour, INetworkRunnerCallbacks
     {
         var data = new NetworkInputData();
 
-        // 채팅창 또는 카드 선택 중이면 이동/사격 입력 무시
+        // 채팅창이 열려 있거나, 증강 선택 페이즈(카드 UI를 볼 수 없는 승자 쪽도 포함)면
+        // 이동/사격 입력을 무시한다.
+        // UpgradeCardSelect.IsSelecting은 "내 화면에 카드 UI가 떠 있는지"만 나타내는
+        // 로컬 상태라, 이번 라운드 선택 자격이 없어 카드 패널이 아예 안 뜨는 승자 쪽은
+        // 이 값이 false로 남아 입력이 안 막히고 총이 나가는 문제가 있었다.
+        // 그래서 양쪽 모두를 동일하게 멈춰야 하는 이 페이즈는 GameFlowManager의
+        // 네트워크 상태로 직접 판단한다.
+        bool isAugmentSelectPhase = GameFlowManager.Instance != null
+            && GameFlowManager.Instance.CurrentState == GameFlowManager.GameState.AugmentSelect;
+
         if ((ChattingScript.Instance != null && ChattingScript.Instance.IsChatOpen)
-            || UpgradeCardSelect.IsSelecting)
+            || UpgradeCardSelect.IsSelecting
+            || isAugmentSelectPhase)
         {
             input.Set(data);
             return;

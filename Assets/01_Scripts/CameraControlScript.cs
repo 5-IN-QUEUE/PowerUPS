@@ -40,8 +40,13 @@ public class CameraController : MonoBehaviour
             InitCamera();
         }
 
-        // 카드 선택 중이면 커서 표시, 아니면 잠금 — 매 프레임 동기화
-        bool showCursor = UpgradeCardSelect.IsSelecting;
+        // 카드 선택 중이거나(내 화면에 카드가 떠 있거나) 증강 선택 페이즈(카드 UI가
+        // 안 뜨는 승자 쪽 포함) 동안은 커서를 보여준다. UpgradeCardSelect.IsSelecting만
+        // 보면 카드 패널이 없는 쪽은 입력은 막혔는데 커서는 계속 잠겨 있어
+        // 아무것도 못 하는 것처럼 보이는 문제가 있었다.
+        bool isAugmentSelectPhase = GameFlowManager.Instance != null
+            && GameFlowManager.Instance.CurrentState == GameFlowManager.GameState.AugmentSelect;
+        bool showCursor = UpgradeCardSelect.IsSelecting || isAugmentSelectPhase;
         Cursor.visible   = showCursor;
         Cursor.lockState = showCursor ? CursorLockMode.None : CursorLockMode.Locked;
 
@@ -67,6 +72,8 @@ public class CameraController : MonoBehaviour
     private void HandleMouseInput()
     {
         if (UpgradeCardSelect.IsSelecting) return;
+        if (GameFlowManager.Instance != null &&
+            GameFlowManager.Instance.CurrentState == GameFlowManager.GameState.AugmentSelect) return;
 
         Yaw   += Input.GetAxisRaw("Mouse X") * sensitivity;
         Pitch -= Input.GetAxisRaw("Mouse Y") * sensitivity;
